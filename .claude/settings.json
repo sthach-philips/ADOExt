@@ -1,13 +1,6 @@
 {
   "defaultMode": "auto",
   "mcpServers": {
-    "github": {
-      "command": "npx.cmd",
-      "args": ["-y", "@github/mcp-server"],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
-      }
-    },
     "playwright": {
       "command": "npx.cmd",
       "args": ["-y", "@playwright/mcp@latest"]
