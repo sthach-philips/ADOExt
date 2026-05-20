@@ -124,7 +124,7 @@ Never import host-side modules from webview files or vice versa — the build wi
 
 The extension's own ADO MCP server is registered by `McpServerManager` and appears in VS Code automatically when the extension is running. It delegates to the official `@azure-devops/mcp` package.
 
-For agent tools available during development (not the extension's own feature), see `.claude/settings.json` (Claude Code), `.vscode/mcp.json` (VS Code Copilot), and `opencode.json` (opencode): GitHub MCP and Playwright MCP are configured in all three.
+For agent tools available during development (not the extension's own feature), see `.claude/settings.json` (Claude Code), `.vscode/mcp.json` (VS Code Copilot), and `opencode.json` (opencode): Playwright MCP is configured in all three.
 
 ## Agent Tooling
 

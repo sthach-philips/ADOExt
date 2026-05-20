@@ -26,7 +26,6 @@ Always run `npm run compile` after TypeScript changes before reporting a task do
 
 ## MCP & Tools Available
 
-- **`github`** MCP — query/manage issues, PRs, and releases on [CompN3rd/ADOExt](https://github.com/CompN3rd/ADOExt)
 - **`playwright`** MCP — drive a browser to test the webview panels (PR details, work item details, planning, pipelines)
 - **ADO MCP** is the extension's *own* feature: `McpServerManager` registers it natively with VS Code when the extension runs — it is not an agent tool
 

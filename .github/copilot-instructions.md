@@ -52,6 +52,5 @@ rtk npm run watch         # incremental rebuild
 
 ## MCP Servers Available
 
-- **`github`** — issues, PRs, releases on CompN3rd/ADOExt (configured in `.vscode/mcp.json`)
 - **`playwright`** — browser automation for testing webview panels (configured in `.vscode/mcp.json`)
 - **ADO MCP** — the extension's own feature, auto-registered by `McpServerManager` when running
