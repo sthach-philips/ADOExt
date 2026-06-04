@@ -1,638 +1,11 @@
-"use strict";
-(() => {
-  // node_modules/@lit/reactive-element/css-tag.js
-  var t = globalThis;
-  var e = t.ShadowRoot && (void 0 === t.ShadyCSS || t.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
-  var s = /* @__PURE__ */ Symbol();
-  var o = /* @__PURE__ */ new WeakMap();
-  var n = class {
-    constructor(t3, e4, o5) {
-      if (this._$cssResult$ = true, o5 !== s) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
-      this.cssText = t3, this.t = e4;
-    }
-    get styleSheet() {
-      let t3 = this.o;
-      const s4 = this.t;
-      if (e && void 0 === t3) {
-        const e4 = void 0 !== s4 && 1 === s4.length;
-        e4 && (t3 = o.get(s4)), void 0 === t3 && ((this.o = t3 = new CSSStyleSheet()).replaceSync(this.cssText), e4 && o.set(s4, t3));
-      }
-      return t3;
-    }
-    toString() {
-      return this.cssText;
-    }
-  };
-  var r = (t3) => new n("string" == typeof t3 ? t3 : t3 + "", void 0, s);
-  var i = (t3, ...e4) => {
-    const o5 = 1 === t3.length ? t3[0] : e4.reduce((e5, s4, o6) => e5 + ((t4) => {
-      if (true === t4._$cssResult$) return t4.cssText;
-      if ("number" == typeof t4) return t4;
-      throw Error("Value passed to 'css' function must be a 'css' function result: " + t4 + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-    })(s4) + t3[o6 + 1], t3[0]);
-    return new n(o5, t3, s);
-  };
-  var S = (s4, o5) => {
-    if (e) s4.adoptedStyleSheets = o5.map((t3) => t3 instanceof CSSStyleSheet ? t3 : t3.styleSheet);
-    else for (const e4 of o5) {
-      const o6 = document.createElement("style"), n4 = t.litNonce;
-      void 0 !== n4 && o6.setAttribute("nonce", n4), o6.textContent = e4.cssText, s4.appendChild(o6);
-    }
-  };
-  var c = e ? (t3) => t3 : (t3) => t3 instanceof CSSStyleSheet ? ((t4) => {
-    let e4 = "";
-    for (const s4 of t4.cssRules) e4 += s4.cssText;
-    return r(e4);
-  })(t3) : t3;
-
-  // node_modules/@lit/reactive-element/reactive-element.js
-  var { is: i2, defineProperty: e2, getOwnPropertyDescriptor: h, getOwnPropertyNames: r2, getOwnPropertySymbols: o2, getPrototypeOf: n2 } = Object;
-  var a = globalThis;
-  var c2 = a.trustedTypes;
-  var l = c2 ? c2.emptyScript : "";
-  var p = a.reactiveElementPolyfillSupport;
-  var d = (t3, s4) => t3;
-  var u = { toAttribute(t3, s4) {
-    switch (s4) {
-      case Boolean:
-        t3 = t3 ? l : null;
-        break;
-      case Object:
-      case Array:
-        t3 = null == t3 ? t3 : JSON.stringify(t3);
-    }
-    return t3;
-  }, fromAttribute(t3, s4) {
-    let i5 = t3;
-    switch (s4) {
-      case Boolean:
-        i5 = null !== t3;
-        break;
-      case Number:
-        i5 = null === t3 ? null : Number(t3);
-        break;
-      case Object:
-      case Array:
-        try {
-          i5 = JSON.parse(t3);
-        } catch (t4) {
-          i5 = null;
-        }
-    }
-    return i5;
-  } };
-  var f = (t3, s4) => !i2(t3, s4);
-  var b = { attribute: true, type: String, converter: u, reflect: false, useDefault: false, hasChanged: f };
-  Symbol.metadata ?? (Symbol.metadata = /* @__PURE__ */ Symbol("metadata")), a.litPropertyMetadata ?? (a.litPropertyMetadata = /* @__PURE__ */ new WeakMap());
-  var y = class extends HTMLElement {
-    static addInitializer(t3) {
-      this._$Ei(), (this.l ?? (this.l = [])).push(t3);
-    }
-    static get observedAttributes() {
-      return this.finalize(), this._$Eh && [...this._$Eh.keys()];
-    }
-    static createProperty(t3, s4 = b) {
-      if (s4.state && (s4.attribute = false), this._$Ei(), this.prototype.hasOwnProperty(t3) && ((s4 = Object.create(s4)).wrapped = true), this.elementProperties.set(t3, s4), !s4.noAccessor) {
-        const i5 = /* @__PURE__ */ Symbol(), h3 = this.getPropertyDescriptor(t3, i5, s4);
-        void 0 !== h3 && e2(this.prototype, t3, h3);
-      }
-    }
-    static getPropertyDescriptor(t3, s4, i5) {
-      const { get: e4, set: r4 } = h(this.prototype, t3) ?? { get() {
-        return this[s4];
-      }, set(t4) {
-        this[s4] = t4;
-      } };
-      return { get: e4, set(s5) {
-        const h3 = e4?.call(this);
-        r4?.call(this, s5), this.requestUpdate(t3, h3, i5);
-      }, configurable: true, enumerable: true };
-    }
-    static getPropertyOptions(t3) {
-      return this.elementProperties.get(t3) ?? b;
-    }
-    static _$Ei() {
-      if (this.hasOwnProperty(d("elementProperties"))) return;
-      const t3 = n2(this);
-      t3.finalize(), void 0 !== t3.l && (this.l = [...t3.l]), this.elementProperties = new Map(t3.elementProperties);
-    }
-    static finalize() {
-      if (this.hasOwnProperty(d("finalized"))) return;
-      if (this.finalized = true, this._$Ei(), this.hasOwnProperty(d("properties"))) {
-        const t4 = this.properties, s4 = [...r2(t4), ...o2(t4)];
-        for (const i5 of s4) this.createProperty(i5, t4[i5]);
-      }
-      const t3 = this[Symbol.metadata];
-      if (null !== t3) {
-        const s4 = litPropertyMetadata.get(t3);
-        if (void 0 !== s4) for (const [t4, i5] of s4) this.elementProperties.set(t4, i5);
-      }
-      this._$Eh = /* @__PURE__ */ new Map();
-      for (const [t4, s4] of this.elementProperties) {
-        const i5 = this._$Eu(t4, s4);
-        void 0 !== i5 && this._$Eh.set(i5, t4);
-      }
-      this.elementStyles = this.finalizeStyles(this.styles);
-    }
-    static finalizeStyles(s4) {
-      const i5 = [];
-      if (Array.isArray(s4)) {
-        const e4 = new Set(s4.flat(1 / 0).reverse());
-        for (const s5 of e4) i5.unshift(c(s5));
-      } else void 0 !== s4 && i5.push(c(s4));
-      return i5;
-    }
-    static _$Eu(t3, s4) {
-      const i5 = s4.attribute;
-      return false === i5 ? void 0 : "string" == typeof i5 ? i5 : "string" == typeof t3 ? t3.toLowerCase() : void 0;
-    }
-    constructor() {
-      super(), this._$Ep = void 0, this.isUpdatePending = false, this.hasUpdated = false, this._$Em = null, this._$Ev();
-    }
-    _$Ev() {
-      this._$ES = new Promise((t3) => this.enableUpdating = t3), this._$AL = /* @__PURE__ */ new Map(), this._$E_(), this.requestUpdate(), this.constructor.l?.forEach((t3) => t3(this));
-    }
-    addController(t3) {
-      (this._$EO ?? (this._$EO = /* @__PURE__ */ new Set())).add(t3), void 0 !== this.renderRoot && this.isConnected && t3.hostConnected?.();
-    }
-    removeController(t3) {
-      this._$EO?.delete(t3);
-    }
-    _$E_() {
-      const t3 = /* @__PURE__ */ new Map(), s4 = this.constructor.elementProperties;
-      for (const i5 of s4.keys()) this.hasOwnProperty(i5) && (t3.set(i5, this[i5]), delete this[i5]);
-      t3.size > 0 && (this._$Ep = t3);
-    }
-    createRenderRoot() {
-      const t3 = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-      return S(t3, this.constructor.elementStyles), t3;
-    }
-    connectedCallback() {
-      this.renderRoot ?? (this.renderRoot = this.createRenderRoot()), this.enableUpdating(true), this._$EO?.forEach((t3) => t3.hostConnected?.());
-    }
-    enableUpdating(t3) {
-    }
-    disconnectedCallback() {
-      this._$EO?.forEach((t3) => t3.hostDisconnected?.());
-    }
-    attributeChangedCallback(t3, s4, i5) {
-      this._$AK(t3, i5);
-    }
-    _$ET(t3, s4) {
-      const i5 = this.constructor.elementProperties.get(t3), e4 = this.constructor._$Eu(t3, i5);
-      if (void 0 !== e4 && true === i5.reflect) {
-        const h3 = (void 0 !== i5.converter?.toAttribute ? i5.converter : u).toAttribute(s4, i5.type);
-        this._$Em = t3, null == h3 ? this.removeAttribute(e4) : this.setAttribute(e4, h3), this._$Em = null;
-      }
-    }
-    _$AK(t3, s4) {
-      const i5 = this.constructor, e4 = i5._$Eh.get(t3);
-      if (void 0 !== e4 && this._$Em !== e4) {
-        const t4 = i5.getPropertyOptions(e4), h3 = "function" == typeof t4.converter ? { fromAttribute: t4.converter } : void 0 !== t4.converter?.fromAttribute ? t4.converter : u;
-        this._$Em = e4;
-        const r4 = h3.fromAttribute(s4, t4.type);
-        this[e4] = r4 ?? this._$Ej?.get(e4) ?? r4, this._$Em = null;
-      }
-    }
-    requestUpdate(t3, s4, i5, e4 = false, h3) {
-      if (void 0 !== t3) {
-        const r4 = this.constructor;
-        if (false === e4 && (h3 = this[t3]), i5 ?? (i5 = r4.getPropertyOptions(t3)), !((i5.hasChanged ?? f)(h3, s4) || i5.useDefault && i5.reflect && h3 === this._$Ej?.get(t3) && !this.hasAttribute(r4._$Eu(t3, i5)))) return;
-        this.C(t3, s4, i5);
-      }
-      false === this.isUpdatePending && (this._$ES = this._$EP());
-    }
-    C(t3, s4, { useDefault: i5, reflect: e4, wrapped: h3 }, r4) {
-      i5 && !(this._$Ej ?? (this._$Ej = /* @__PURE__ */ new Map())).has(t3) && (this._$Ej.set(t3, r4 ?? s4 ?? this[t3]), true !== h3 || void 0 !== r4) || (this._$AL.has(t3) || (this.hasUpdated || i5 || (s4 = void 0), this._$AL.set(t3, s4)), true === e4 && this._$Em !== t3 && (this._$Eq ?? (this._$Eq = /* @__PURE__ */ new Set())).add(t3));
-    }
-    async _$EP() {
-      this.isUpdatePending = true;
-      try {
-        await this._$ES;
-      } catch (t4) {
-        Promise.reject(t4);
-      }
-      const t3 = this.scheduleUpdate();
-      return null != t3 && await t3, !this.isUpdatePending;
-    }
-    scheduleUpdate() {
-      return this.performUpdate();
-    }
-    performUpdate() {
-      if (!this.isUpdatePending) return;
-      if (!this.hasUpdated) {
-        if (this.renderRoot ?? (this.renderRoot = this.createRenderRoot()), this._$Ep) {
-          for (const [t5, s5] of this._$Ep) this[t5] = s5;
-          this._$Ep = void 0;
-        }
-        const t4 = this.constructor.elementProperties;
-        if (t4.size > 0) for (const [s5, i5] of t4) {
-          const { wrapped: t5 } = i5, e4 = this[s5];
-          true !== t5 || this._$AL.has(s5) || void 0 === e4 || this.C(s5, void 0, i5, e4);
-        }
-      }
-      let t3 = false;
-      const s4 = this._$AL;
-      try {
-        t3 = this.shouldUpdate(s4), t3 ? (this.willUpdate(s4), this._$EO?.forEach((t4) => t4.hostUpdate?.()), this.update(s4)) : this._$EM();
-      } catch (s5) {
-        throw t3 = false, this._$EM(), s5;
-      }
-      t3 && this._$AE(s4);
-    }
-    willUpdate(t3) {
-    }
-    _$AE(t3) {
-      this._$EO?.forEach((t4) => t4.hostUpdated?.()), this.hasUpdated || (this.hasUpdated = true, this.firstUpdated(t3)), this.updated(t3);
-    }
-    _$EM() {
-      this._$AL = /* @__PURE__ */ new Map(), this.isUpdatePending = false;
-    }
-    get updateComplete() {
-      return this.getUpdateComplete();
-    }
-    getUpdateComplete() {
-      return this._$ES;
-    }
-    shouldUpdate(t3) {
-      return true;
-    }
-    update(t3) {
-      this._$Eq && (this._$Eq = this._$Eq.forEach((t4) => this._$ET(t4, this[t4]))), this._$EM();
-    }
-    updated(t3) {
-    }
-    firstUpdated(t3) {
-    }
-  };
-  y.elementStyles = [], y.shadowRootOptions = { mode: "open" }, y[d("elementProperties")] = /* @__PURE__ */ new Map(), y[d("finalized")] = /* @__PURE__ */ new Map(), p?.({ ReactiveElement: y }), (a.reactiveElementVersions ?? (a.reactiveElementVersions = [])).push("2.1.2");
-
-  // node_modules/lit-html/lit-html.js
-  var t2 = globalThis;
-  var i3 = (t3) => t3;
-  var s2 = t2.trustedTypes;
-  var e3 = s2 ? s2.createPolicy("lit-html", { createHTML: (t3) => t3 }) : void 0;
-  var h2 = "$lit$";
-  var o3 = `lit$${Math.random().toFixed(9).slice(2)}$`;
-  var n3 = "?" + o3;
-  var r3 = `<${n3}>`;
-  var l2 = document;
-  var c3 = () => l2.createComment("");
-  var a2 = (t3) => null === t3 || "object" != typeof t3 && "function" != typeof t3;
-  var u2 = Array.isArray;
-  var d2 = (t3) => u2(t3) || "function" == typeof t3?.[Symbol.iterator];
-  var f2 = "[ 	\n\f\r]";
-  var v = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g;
-  var _ = /-->/g;
-  var m = />/g;
-  var p2 = RegExp(`>|${f2}(?:([^\\s"'>=/]+)(${f2}*=${f2}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g");
-  var g = /'/g;
-  var $ = /"/g;
-  var y2 = /^(?:script|style|textarea|title)$/i;
-  var x = (t3) => (i5, ...s4) => ({ _$litType$: t3, strings: i5, values: s4 });
-  var b2 = x(1);
-  var w = x(2);
-  var T = x(3);
-  var E = /* @__PURE__ */ Symbol.for("lit-noChange");
-  var A = /* @__PURE__ */ Symbol.for("lit-nothing");
-  var C = /* @__PURE__ */ new WeakMap();
-  var P = l2.createTreeWalker(l2, 129);
-  function V(t3, i5) {
-    if (!u2(t3) || !t3.hasOwnProperty("raw")) throw Error("invalid template strings array");
-    return void 0 !== e3 ? e3.createHTML(i5) : i5;
-  }
-  var N = (t3, i5) => {
-    const s4 = t3.length - 1, e4 = [];
-    let n4, l3 = 2 === i5 ? "<svg>" : 3 === i5 ? "<math>" : "", c4 = v;
-    for (let i6 = 0; i6 < s4; i6++) {
-      const s5 = t3[i6];
-      let a3, u3, d3 = -1, f3 = 0;
-      for (; f3 < s5.length && (c4.lastIndex = f3, u3 = c4.exec(s5), null !== u3); ) f3 = c4.lastIndex, c4 === v ? "!--" === u3[1] ? c4 = _ : void 0 !== u3[1] ? c4 = m : void 0 !== u3[2] ? (y2.test(u3[2]) && (n4 = RegExp("</" + u3[2], "g")), c4 = p2) : void 0 !== u3[3] && (c4 = p2) : c4 === p2 ? ">" === u3[0] ? (c4 = n4 ?? v, d3 = -1) : void 0 === u3[1] ? d3 = -2 : (d3 = c4.lastIndex - u3[2].length, a3 = u3[1], c4 = void 0 === u3[3] ? p2 : '"' === u3[3] ? $ : g) : c4 === $ || c4 === g ? c4 = p2 : c4 === _ || c4 === m ? c4 = v : (c4 = p2, n4 = void 0);
-      const x2 = c4 === p2 && t3[i6 + 1].startsWith("/>") ? " " : "";
-      l3 += c4 === v ? s5 + r3 : d3 >= 0 ? (e4.push(a3), s5.slice(0, d3) + h2 + s5.slice(d3) + o3 + x2) : s5 + o3 + (-2 === d3 ? i6 : x2);
-    }
-    return [V(t3, l3 + (t3[s4] || "<?>") + (2 === i5 ? "</svg>" : 3 === i5 ? "</math>" : "")), e4];
-  };
-  var S2 = class _S {
-    constructor({ strings: t3, _$litType$: i5 }, e4) {
-      let r4;
-      this.parts = [];
-      let l3 = 0, a3 = 0;
-      const u3 = t3.length - 1, d3 = this.parts, [f3, v2] = N(t3, i5);
-      if (this.el = _S.createElement(f3, e4), P.currentNode = this.el.content, 2 === i5 || 3 === i5) {
-        const t4 = this.el.content.firstChild;
-        t4.replaceWith(...t4.childNodes);
-      }
-      for (; null !== (r4 = P.nextNode()) && d3.length < u3; ) {
-        if (1 === r4.nodeType) {
-          if (r4.hasAttributes()) for (const t4 of r4.getAttributeNames()) if (t4.endsWith(h2)) {
-            const i6 = v2[a3++], s4 = r4.getAttribute(t4).split(o3), e5 = /([.?@])?(.*)/.exec(i6);
-            d3.push({ type: 1, index: l3, name: e5[2], strings: s4, ctor: "." === e5[1] ? I : "?" === e5[1] ? L : "@" === e5[1] ? z : H }), r4.removeAttribute(t4);
-          } else t4.startsWith(o3) && (d3.push({ type: 6, index: l3 }), r4.removeAttribute(t4));
-          if (y2.test(r4.tagName)) {
-            const t4 = r4.textContent.split(o3), i6 = t4.length - 1;
-            if (i6 > 0) {
-              r4.textContent = s2 ? s2.emptyScript : "";
-              for (let s4 = 0; s4 < i6; s4++) r4.append(t4[s4], c3()), P.nextNode(), d3.push({ type: 2, index: ++l3 });
-              r4.append(t4[i6], c3());
-            }
-          }
-        } else if (8 === r4.nodeType) if (r4.data === n3) d3.push({ type: 2, index: l3 });
-        else {
-          let t4 = -1;
-          for (; -1 !== (t4 = r4.data.indexOf(o3, t4 + 1)); ) d3.push({ type: 7, index: l3 }), t4 += o3.length - 1;
-        }
-        l3++;
-      }
-    }
-    static createElement(t3, i5) {
-      const s4 = l2.createElement("template");
-      return s4.innerHTML = t3, s4;
-    }
-  };
-  function M(t3, i5, s4 = t3, e4) {
-    if (i5 === E) return i5;
-    let h3 = void 0 !== e4 ? s4._$Co?.[e4] : s4._$Cl;
-    const o5 = a2(i5) ? void 0 : i5._$litDirective$;
-    return h3?.constructor !== o5 && (h3?._$AO?.(false), void 0 === o5 ? h3 = void 0 : (h3 = new o5(t3), h3._$AT(t3, s4, e4)), void 0 !== e4 ? (s4._$Co ?? (s4._$Co = []))[e4] = h3 : s4._$Cl = h3), void 0 !== h3 && (i5 = M(t3, h3._$AS(t3, i5.values), h3, e4)), i5;
-  }
-  var R = class {
-    constructor(t3, i5) {
-      this._$AV = [], this._$AN = void 0, this._$AD = t3, this._$AM = i5;
-    }
-    get parentNode() {
-      return this._$AM.parentNode;
-    }
-    get _$AU() {
-      return this._$AM._$AU;
-    }
-    u(t3) {
-      const { el: { content: i5 }, parts: s4 } = this._$AD, e4 = (t3?.creationScope ?? l2).importNode(i5, true);
-      P.currentNode = e4;
-      let h3 = P.nextNode(), o5 = 0, n4 = 0, r4 = s4[0];
-      for (; void 0 !== r4; ) {
-        if (o5 === r4.index) {
-          let i6;
-          2 === r4.type ? i6 = new k(h3, h3.nextSibling, this, t3) : 1 === r4.type ? i6 = new r4.ctor(h3, r4.name, r4.strings, this, t3) : 6 === r4.type && (i6 = new Z(h3, this, t3)), this._$AV.push(i6), r4 = s4[++n4];
-        }
-        o5 !== r4?.index && (h3 = P.nextNode(), o5++);
-      }
-      return P.currentNode = l2, e4;
-    }
-    p(t3) {
-      let i5 = 0;
-      for (const s4 of this._$AV) void 0 !== s4 && (void 0 !== s4.strings ? (s4._$AI(t3, s4, i5), i5 += s4.strings.length - 2) : s4._$AI(t3[i5])), i5++;
-    }
-  };
-  var k = class _k {
-    get _$AU() {
-      return this._$AM?._$AU ?? this._$Cv;
-    }
-    constructor(t3, i5, s4, e4) {
-      this.type = 2, this._$AH = A, this._$AN = void 0, this._$AA = t3, this._$AB = i5, this._$AM = s4, this.options = e4, this._$Cv = e4?.isConnected ?? true;
-    }
-    get parentNode() {
-      let t3 = this._$AA.parentNode;
-      const i5 = this._$AM;
-      return void 0 !== i5 && 11 === t3?.nodeType && (t3 = i5.parentNode), t3;
-    }
-    get startNode() {
-      return this._$AA;
-    }
-    get endNode() {
-      return this._$AB;
-    }
-    _$AI(t3, i5 = this) {
-      t3 = M(this, t3, i5), a2(t3) ? t3 === A || null == t3 || "" === t3 ? (this._$AH !== A && this._$AR(), this._$AH = A) : t3 !== this._$AH && t3 !== E && this._(t3) : void 0 !== t3._$litType$ ? this.$(t3) : void 0 !== t3.nodeType ? this.T(t3) : d2(t3) ? this.k(t3) : this._(t3);
-    }
-    O(t3) {
-      return this._$AA.parentNode.insertBefore(t3, this._$AB);
-    }
-    T(t3) {
-      this._$AH !== t3 && (this._$AR(), this._$AH = this.O(t3));
-    }
-    _(t3) {
-      this._$AH !== A && a2(this._$AH) ? this._$AA.nextSibling.data = t3 : this.T(l2.createTextNode(t3)), this._$AH = t3;
-    }
-    $(t3) {
-      const { values: i5, _$litType$: s4 } = t3, e4 = "number" == typeof s4 ? this._$AC(t3) : (void 0 === s4.el && (s4.el = S2.createElement(V(s4.h, s4.h[0]), this.options)), s4);
-      if (this._$AH?._$AD === e4) this._$AH.p(i5);
-      else {
-        const t4 = new R(e4, this), s5 = t4.u(this.options);
-        t4.p(i5), this.T(s5), this._$AH = t4;
-      }
-    }
-    _$AC(t3) {
-      let i5 = C.get(t3.strings);
-      return void 0 === i5 && C.set(t3.strings, i5 = new S2(t3)), i5;
-    }
-    k(t3) {
-      u2(this._$AH) || (this._$AH = [], this._$AR());
-      const i5 = this._$AH;
-      let s4, e4 = 0;
-      for (const h3 of t3) e4 === i5.length ? i5.push(s4 = new _k(this.O(c3()), this.O(c3()), this, this.options)) : s4 = i5[e4], s4._$AI(h3), e4++;
-      e4 < i5.length && (this._$AR(s4 && s4._$AB.nextSibling, e4), i5.length = e4);
-    }
-    _$AR(t3 = this._$AA.nextSibling, s4) {
-      for (this._$AP?.(false, true, s4); t3 !== this._$AB; ) {
-        const s5 = i3(t3).nextSibling;
-        i3(t3).remove(), t3 = s5;
-      }
-    }
-    setConnected(t3) {
-      void 0 === this._$AM && (this._$Cv = t3, this._$AP?.(t3));
-    }
-  };
-  var H = class {
-    get tagName() {
-      return this.element.tagName;
-    }
-    get _$AU() {
-      return this._$AM._$AU;
-    }
-    constructor(t3, i5, s4, e4, h3) {
-      this.type = 1, this._$AH = A, this._$AN = void 0, this.element = t3, this.name = i5, this._$AM = e4, this.options = h3, s4.length > 2 || "" !== s4[0] || "" !== s4[1] ? (this._$AH = Array(s4.length - 1).fill(new String()), this.strings = s4) : this._$AH = A;
-    }
-    _$AI(t3, i5 = this, s4, e4) {
-      const h3 = this.strings;
-      let o5 = false;
-      if (void 0 === h3) t3 = M(this, t3, i5, 0), o5 = !a2(t3) || t3 !== this._$AH && t3 !== E, o5 && (this._$AH = t3);
-      else {
-        const e5 = t3;
-        let n4, r4;
-        for (t3 = h3[0], n4 = 0; n4 < h3.length - 1; n4++) r4 = M(this, e5[s4 + n4], i5, n4), r4 === E && (r4 = this._$AH[n4]), o5 || (o5 = !a2(r4) || r4 !== this._$AH[n4]), r4 === A ? t3 = A : t3 !== A && (t3 += (r4 ?? "") + h3[n4 + 1]), this._$AH[n4] = r4;
-      }
-      o5 && !e4 && this.j(t3);
-    }
-    j(t3) {
-      t3 === A ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t3 ?? "");
-    }
-  };
-  var I = class extends H {
-    constructor() {
-      super(...arguments), this.type = 3;
-    }
-    j(t3) {
-      this.element[this.name] = t3 === A ? void 0 : t3;
-    }
-  };
-  var L = class extends H {
-    constructor() {
-      super(...arguments), this.type = 4;
-    }
-    j(t3) {
-      this.element.toggleAttribute(this.name, !!t3 && t3 !== A);
-    }
-  };
-  var z = class extends H {
-    constructor(t3, i5, s4, e4, h3) {
-      super(t3, i5, s4, e4, h3), this.type = 5;
-    }
-    _$AI(t3, i5 = this) {
-      if ((t3 = M(this, t3, i5, 0) ?? A) === E) return;
-      const s4 = this._$AH, e4 = t3 === A && s4 !== A || t3.capture !== s4.capture || t3.once !== s4.once || t3.passive !== s4.passive, h3 = t3 !== A && (s4 === A || e4);
-      e4 && this.element.removeEventListener(this.name, this, s4), h3 && this.element.addEventListener(this.name, this, t3), this._$AH = t3;
-    }
-    handleEvent(t3) {
-      "function" == typeof this._$AH ? this._$AH.call(this.options?.host ?? this.element, t3) : this._$AH.handleEvent(t3);
-    }
-  };
-  var Z = class {
-    constructor(t3, i5, s4) {
-      this.element = t3, this.type = 6, this._$AN = void 0, this._$AM = i5, this.options = s4;
-    }
-    get _$AU() {
-      return this._$AM._$AU;
-    }
-    _$AI(t3) {
-      M(this, t3);
-    }
-  };
-  var B = t2.litHtmlPolyfillSupport;
-  B?.(S2, k), (t2.litHtmlVersions ?? (t2.litHtmlVersions = [])).push("3.3.2");
-  var D = (t3, i5, s4) => {
-    const e4 = s4?.renderBefore ?? i5;
-    let h3 = e4._$litPart$;
-    if (void 0 === h3) {
-      const t4 = s4?.renderBefore ?? null;
-      e4._$litPart$ = h3 = new k(i5.insertBefore(c3(), t4), t4, void 0, s4 ?? {});
-    }
-    return h3._$AI(t3), h3;
-  };
-
-  // node_modules/lit-element/lit-element.js
-  var s3 = globalThis;
-  var i4 = class extends y {
-    constructor() {
-      super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
-    }
-    createRenderRoot() {
-      var _a;
-      const t3 = super.createRenderRoot();
-      return (_a = this.renderOptions).renderBefore ?? (_a.renderBefore = t3.firstChild), t3;
-    }
-    update(t3) {
-      const r4 = this.render();
-      this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t3), this._$Do = D(r4, this.renderRoot, this.renderOptions);
-    }
-    connectedCallback() {
-      super.connectedCallback(), this._$Do?.setConnected(true);
-    }
-    disconnectedCallback() {
-      super.disconnectedCallback(), this._$Do?.setConnected(false);
-    }
-    render() {
-      return E;
-    }
-  };
-  i4._$litElement$ = true, i4["finalized"] = true, s3.litElementHydrateSupport?.({ LitElement: i4 });
-  var o4 = s3.litElementPolyfillSupport;
-  o4?.({ LitElement: i4 });
-  (s3.litElementVersions ?? (s3.litElementVersions = [])).push("4.2.2");
-
-  // src/views/webview/vscodeApi.ts
-  var api;
-  function vscode() {
-    if (!api) {
-      api = acquireVsCodeApi();
-    }
-    return api;
-  }
-  function readInitialData() {
-    const element = document.getElementById("adoext-data");
-    if (!element?.textContent) {
-      throw new Error("Missing ADOExt webview data.");
-    }
-    return JSON.parse(element.textContent);
-  }
-  function postMessage(message) {
-    vscode().postMessage(message);
-  }
-
-  // src/views/webview/builds.ts
-  var AdoBuildList = class extends i4 {
-    constructor() {
-      super(...arguments);
-      this.builds = [];
-      this.emptyLabel = "No builds found.";
-    }
-    render() {
-      if (this.builds.length === 0) {
-        return b2`<p class="empty">${this.emptyLabel}</p>`;
-      }
-      return b2`${this.builds.map((build) => this.renderBuild(build))}`;
-    }
-    renderBuild(build) {
-      const metaParts = [build.definitionName, build.requestedFor, build.startTime].filter(Boolean);
-      const statusClass = this.statusClass(build.statusKind);
-      return b2`<div class="build-item">
-            <span class="build-status ${statusClass}">${build.statusLabel}</span>
-            <span class="build-name" title=${build.buildNumber}>${build.buildNumber}</span>
-            ${metaParts.length > 0 ? b2`<span class="build-meta" title=${metaParts.join(" - ")}>${metaParts.join(" - ")}</span>` : A}
-            ${build.id > 0 ? b2`<button type="button" @click=${() => this.openBuild(build.id)}>Open</button>` : A}
-        </div>`;
-    }
-    statusClass(statusKind) {
-      switch (statusKind) {
-        case "succeeded":
-          return "build-status-succeeded";
-        case "failed":
-          return "build-status-failed";
-        case "inprogress":
-          return "build-status-inprogress";
-        default:
-          return "build-status-other";
-      }
-    }
-    openBuild(buildId) {
-      this.dispatchEvent(new CustomEvent("adoext-open-build", {
-        bubbles: true,
-        composed: true,
-        detail: { buildId }
-      }));
-    }
-  };
-  AdoBuildList.properties = {
-    builds: {
-      attribute: "builds-json",
-      converter: {
-        fromAttribute(value) {
-          if (!value) {
-            return [];
-          }
-          try {
-            const parsed = JSON.parse(value);
-            return Array.isArray(parsed) ? parsed : [];
-          } catch {
-            return [];
-          }
-        }
-      }
-    },
-    emptyLabel: { attribute: "empty-label" }
-  };
-  AdoBuildList.styles = i`
+"use strict";(()=>{var D=globalThis,L=D.ShadowRoot&&(D.ShadyCSS===void 0||D.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,V=Symbol(),ee=new WeakMap,C=class{constructor(t,e,s){if(this._$cssResult$=!0,s!==V)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o,e=this.t;if(L&&t===void 0){let s=e!==void 0&&e.length===1;s&&(t=ee.get(e)),t===void 0&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),s&&ee.set(e,t))}return t}toString(){return this.cssText}},te=i=>new C(typeof i=="string"?i:i+"",void 0,V),k=(i,...t)=>{let e=i.length===1?i[0]:t.reduce((s,o,r)=>s+(a=>{if(a._$cssResult$===!0)return a.cssText;if(typeof a=="number")return a;throw Error("Value passed to 'css' function must be a 'css' function result: "+a+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(o)+i[r+1],i[0]);return new C(e,i,V)},se=(i,t)=>{if(L)i.adoptedStyleSheets=t.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(let e of t){let s=document.createElement("style"),o=D.litNonce;o!==void 0&&s.setAttribute("nonce",o),s.textContent=e.cssText,i.appendChild(s)}},F=L?i=>i:i=>i instanceof CSSStyleSheet?(t=>{let e="";for(let s of t.cssRules)e+=s.cssText;return te(e)})(i):i;var{is:ye,defineProperty:xe,getOwnPropertyDescriptor:_e,getOwnPropertyNames:we,getOwnPropertySymbols:Se,getPrototypeOf:Ae}=Object,f=globalThis,oe=f.trustedTypes,Ce=oe?oe.emptyScript:"",ke=f.reactiveElementPolyfillSupport,T=(i,t)=>i,j={toAttribute(i,t){switch(t){case Boolean:i=i?Ce:null;break;case Object:case Array:i=i==null?i:JSON.stringify(i)}return i},fromAttribute(i,t){let e=i;switch(t){case Boolean:e=i!==null;break;case Number:e=i===null?null:Number(i);break;case Object:case Array:try{e=JSON.parse(i)}catch{e=null}}return e}},re=(i,t)=>!ye(i,t),ie={attribute:!0,type:String,converter:j,reflect:!1,useDefault:!1,hasChanged:re};Symbol.metadata??(Symbol.metadata=Symbol("metadata")),f.litPropertyMetadata??(f.litPropertyMetadata=new WeakMap);var g=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??(this.l=[])).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=ie){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){let s=Symbol(),o=this.getPropertyDescriptor(t,s,e);o!==void 0&&xe(this.prototype,t,o)}}static getPropertyDescriptor(t,e,s){let{get:o,set:r}=_e(this.prototype,t)??{get(){return this[e]},set(a){this[e]=a}};return{get:o,set(a){let p=o?.call(this);r?.call(this,a),this.requestUpdate(t,p,s)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??ie}static _$Ei(){if(this.hasOwnProperty(T("elementProperties")))return;let t=Ae(this);t.finalize(),t.l!==void 0&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(T("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(T("properties"))){let e=this.properties,s=[...we(e),...Se(e)];for(let o of s)this.createProperty(o,e[o])}let t=this[Symbol.metadata];if(t!==null){let e=litPropertyMetadata.get(t);if(e!==void 0)for(let[s,o]of e)this.elementProperties.set(s,o)}this._$Eh=new Map;for(let[e,s]of this.elementProperties){let o=this._$Eu(e,s);o!==void 0&&this._$Eh.set(o,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){let e=[];if(Array.isArray(t)){let s=new Set(t.flat(1/0).reverse());for(let o of s)e.unshift(F(o))}else t!==void 0&&e.push(F(t));return e}static _$Eu(t,e){let s=e.attribute;return s===!1?void 0:typeof s=="string"?s:typeof t=="string"?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??(this._$EO=new Set)).add(t),this.renderRoot!==void 0&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){let t=new Map,e=this.constructor.elementProperties;for(let s of e.keys())this.hasOwnProperty(s)&&(t.set(s,this[s]),delete this[s]);t.size>0&&(this._$Ep=t)}createRenderRoot(){let t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return se(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,s){this._$AK(t,s)}_$ET(t,e){let s=this.constructor.elementProperties.get(t),o=this.constructor._$Eu(t,s);if(o!==void 0&&s.reflect===!0){let r=(s.converter?.toAttribute!==void 0?s.converter:j).toAttribute(e,s.type);this._$Em=t,r==null?this.removeAttribute(o):this.setAttribute(o,r),this._$Em=null}}_$AK(t,e){let s=this.constructor,o=s._$Eh.get(t);if(o!==void 0&&this._$Em!==o){let r=s.getPropertyOptions(o),a=typeof r.converter=="function"?{fromAttribute:r.converter}:r.converter?.fromAttribute!==void 0?r.converter:j;this._$Em=o;let p=a.fromAttribute(e,r.type);this[o]=p??this._$Ej?.get(o)??p,this._$Em=null}}requestUpdate(t,e,s,o=!1,r){if(t!==void 0){let a=this.constructor;if(o===!1&&(r=this[t]),s??(s=a.getPropertyOptions(t)),!((s.hasChanged??re)(r,e)||s.useDefault&&s.reflect&&r===this._$Ej?.get(t)&&!this.hasAttribute(a._$Eu(t,s))))return;this.C(t,e,s)}this.isUpdatePending===!1&&(this._$ES=this._$EP())}C(t,e,{useDefault:s,reflect:o,wrapped:r},a){s&&!(this._$Ej??(this._$Ej=new Map)).has(t)&&(this._$Ej.set(t,a??e??this[t]),r!==!0||a!==void 0)||(this._$AL.has(t)||(this.hasUpdated||s||(e=void 0),this._$AL.set(t,e)),o===!0&&this._$Em!==t&&(this._$Eq??(this._$Eq=new Set)).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}let t=this.scheduleUpdate();return t!=null&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??(this.renderRoot=this.createRenderRoot()),this._$Ep){for(let[o,r]of this._$Ep)this[o]=r;this._$Ep=void 0}let s=this.constructor.elementProperties;if(s.size>0)for(let[o,r]of s){let{wrapped:a}=r,p=this[o];a!==!0||this._$AL.has(o)||p===void 0||this.C(o,void 0,r,p)}}let t=!1,e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(s=>s.hostUpdate?.()),this.update(e)):this._$EM()}catch(s){throw t=!1,this._$EM(),s}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&(this._$Eq=this._$Eq.forEach(e=>this._$ET(e,this[e]))),this._$EM()}updated(t){}firstUpdated(t){}};g.elementStyles=[],g.shadowRootOptions={mode:"open"},g[T("elementProperties")]=new Map,g[T("finalized")]=new Map,ke?.({ReactiveElement:g}),(f.reactiveElementVersions??(f.reactiveElementVersions=[])).push("2.1.2");var M=globalThis,ae=i=>i,I=M.trustedTypes,ne=I?I.createPolicy("lit-html",{createHTML:i=>i}):void 0,ue="$lit$",$=`lit$${Math.random().toFixed(9).slice(2)}$`,me="?"+$,Te=`<${me}>`,_=document,P=()=>_.createComment(""),R=i=>i===null||typeof i!="object"&&typeof i!="function",G=Array.isArray,Ee=i=>G(i)||typeof i?.[Symbol.iterator]=="function",W=`[ 	
+\f\r]`,E=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,de=/-->/g,le=/>/g,y=RegExp(`>|${W}(?:([^\\s"'>=/]+)(${W}*=${W}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`,"g"),ce=/'/g,pe=/"/g,ve=/^(?:script|style|textarea|title)$/i,X=i=>(t,...e)=>({_$litType$:i,strings:t,values:e}),n=X(1),Ue=X(2),De=X(3),w=Symbol.for("lit-noChange"),d=Symbol.for("lit-nothing"),he=new WeakMap,x=_.createTreeWalker(_,129);function ge(i,t){if(!G(i)||!i.hasOwnProperty("raw"))throw Error("invalid template strings array");return ne!==void 0?ne.createHTML(t):t}var Me=(i,t)=>{let e=i.length-1,s=[],o,r=t===2?"<svg>":t===3?"<math>":"",a=E;for(let p=0;p<e;p++){let l=i[p],h,u,c=-1,v=0;for(;v<l.length&&(a.lastIndex=v,u=a.exec(l),u!==null);)v=a.lastIndex,a===E?u[1]==="!--"?a=de:u[1]!==void 0?a=le:u[2]!==void 0?(ve.test(u[2])&&(o=RegExp("</"+u[2],"g")),a=y):u[3]!==void 0&&(a=y):a===y?u[0]===">"?(a=o??E,c=-1):u[1]===void 0?c=-2:(c=a.lastIndex-u[2].length,h=u[1],a=u[3]===void 0?y:u[3]==='"'?pe:ce):a===pe||a===ce?a=y:a===de||a===le?a=E:(a=y,o=void 0);let b=a===y&&i[p+1].startsWith("/>")?" ":"";r+=a===E?l+Te:c>=0?(s.push(h),l.slice(0,c)+ue+l.slice(c)+$+b):l+$+(c===-2?p:b)}return[ge(i,r+(i[e]||"<?>")+(t===2?"</svg>":t===3?"</math>":"")),s]},N=class i{constructor({strings:t,_$litType$:e},s){let o;this.parts=[];let r=0,a=0,p=t.length-1,l=this.parts,[h,u]=Me(t,e);if(this.el=i.createElement(h,s),x.currentNode=this.el.content,e===2||e===3){let c=this.el.content.firstChild;c.replaceWith(...c.childNodes)}for(;(o=x.nextNode())!==null&&l.length<p;){if(o.nodeType===1){if(o.hasAttributes())for(let c of o.getAttributeNames())if(c.endsWith(ue)){let v=u[a++],b=o.getAttribute(c).split($),U=/([.?@])?(.*)/.exec(v);l.push({type:1,index:r,name:U[2],strings:b,ctor:U[1]==="."?K:U[1]==="?"?J:U[1]==="@"?Q:A}),o.removeAttribute(c)}else c.startsWith($)&&(l.push({type:6,index:r}),o.removeAttribute(c));if(ve.test(o.tagName)){let c=o.textContent.split($),v=c.length-1;if(v>0){o.textContent=I?I.emptyScript:"";for(let b=0;b<v;b++)o.append(c[b],P()),x.nextNode(),l.push({type:2,index:++r});o.append(c[v],P())}}}else if(o.nodeType===8)if(o.data===me)l.push({type:2,index:r});else{let c=-1;for(;(c=o.data.indexOf($,c+1))!==-1;)l.push({type:7,index:r}),c+=$.length-1}r++}}static createElement(t,e){let s=_.createElement("template");return s.innerHTML=t,s}};function S(i,t,e=i,s){if(t===w)return t;let o=s!==void 0?e._$Co?.[s]:e._$Cl,r=R(t)?void 0:t._$litDirective$;return o?.constructor!==r&&(o?._$AO?.(!1),r===void 0?o=void 0:(o=new r(i),o._$AT(i,e,s)),s!==void 0?(e._$Co??(e._$Co=[]))[s]=o:e._$Cl=o),o!==void 0&&(t=S(i,o._$AS(i,t.values),o,s)),t}var q=class{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){let{el:{content:e},parts:s}=this._$AD,o=(t?.creationScope??_).importNode(e,!0);x.currentNode=o;let r=x.nextNode(),a=0,p=0,l=s[0];for(;l!==void 0;){if(a===l.index){let h;l.type===2?h=new B(r,r.nextSibling,this,t):l.type===1?h=new l.ctor(r,l.name,l.strings,this,t):l.type===6&&(h=new Z(r,this,t)),this._$AV.push(h),l=s[++p]}a!==l?.index&&(r=x.nextNode(),a++)}return x.currentNode=_,o}p(t){let e=0;for(let s of this._$AV)s!==void 0&&(s.strings!==void 0?(s._$AI(t,s,e),e+=s.strings.length-2):s._$AI(t[e])),e++}},B=class i{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,s,o){this.type=2,this._$AH=d,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=s,this.options=o,this._$Cv=o?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode,e=this._$AM;return e!==void 0&&t?.nodeType===11&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=S(this,t,e),R(t)?t===d||t==null||t===""?(this._$AH!==d&&this._$AR(),this._$AH=d):t!==this._$AH&&t!==w&&this._(t):t._$litType$!==void 0?this.$(t):t.nodeType!==void 0?this.T(t):Ee(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==d&&R(this._$AH)?this._$AA.nextSibling.data=t:this.T(_.createTextNode(t)),this._$AH=t}$(t){let{values:e,_$litType$:s}=t,o=typeof s=="number"?this._$AC(t):(s.el===void 0&&(s.el=N.createElement(ge(s.h,s.h[0]),this.options)),s);if(this._$AH?._$AD===o)this._$AH.p(e);else{let r=new q(o,this),a=r.u(this.options);r.p(e),this.T(a),this._$AH=r}}_$AC(t){let e=he.get(t.strings);return e===void 0&&he.set(t.strings,e=new N(t)),e}k(t){G(this._$AH)||(this._$AH=[],this._$AR());let e=this._$AH,s,o=0;for(let r of t)o===e.length?e.push(s=new i(this.O(P()),this.O(P()),this,this.options)):s=e[o],s._$AI(r),o++;o<e.length&&(this._$AR(s&&s._$AB.nextSibling,o),e.length=o)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){let s=ae(t).nextSibling;ae(t).remove(),t=s}}setConnected(t){this._$AM===void 0&&(this._$Cv=t,this._$AP?.(t))}},A=class{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,s,o,r){this.type=1,this._$AH=d,this._$AN=void 0,this.element=t,this.name=e,this._$AM=o,this.options=r,s.length>2||s[0]!==""||s[1]!==""?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=d}_$AI(t,e=this,s,o){let r=this.strings,a=!1;if(r===void 0)t=S(this,t,e,0),a=!R(t)||t!==this._$AH&&t!==w,a&&(this._$AH=t);else{let p=t,l,h;for(t=r[0],l=0;l<r.length-1;l++)h=S(this,p[s+l],e,l),h===w&&(h=this._$AH[l]),a||(a=!R(h)||h!==this._$AH[l]),h===d?t=d:t!==d&&(t+=(h??"")+r[l+1]),this._$AH[l]=h}a&&!o&&this.j(t)}j(t){t===d?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}},K=class extends A{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===d?void 0:t}},J=class extends A{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==d)}},Q=class extends A{constructor(t,e,s,o,r){super(t,e,s,o,r),this.type=5}_$AI(t,e=this){if((t=S(this,t,e,0)??d)===w)return;let s=this._$AH,o=t===d&&s!==d||t.capture!==s.capture||t.once!==s.once||t.passive!==s.passive,r=t!==d&&(s===d||o);o&&this.element.removeEventListener(this.name,this,s),r&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){typeof this._$AH=="function"?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}},Z=class{constructor(t,e,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=s}get _$AU(){return this._$AM._$AU}_$AI(t){S(this,t)}};var Pe=M.litHtmlPolyfillSupport;Pe?.(N,B),(M.litHtmlVersions??(M.litHtmlVersions=[])).push("3.3.2");var be=(i,t,e)=>{let s=e?.renderBefore??t,o=s._$litPart$;if(o===void 0){let r=e?.renderBefore??null;s._$litPart$=o=new B(t.insertBefore(P(),r),r,void 0,e??{})}return o._$AI(i),o};var z=globalThis,m=class extends g{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){var e;let t=super.createRenderRoot();return(e=this.renderOptions).renderBefore??(e.renderBefore=t.firstChild),t}update(t){let e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=be(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return w}};m._$litElement$=!0,m.finalized=!0,z.litElementHydrateSupport?.({LitElement:m});var Re=z.litElementPolyfillSupport;Re?.({LitElement:m});(z.litElementVersions??(z.litElementVersions=[])).push("4.2.2");var Y;function Ne(){return Y||(Y=acquireVsCodeApi()),Y}function fe(){let i=document.getElementById("adoext-data");if(!i?.textContent)throw new Error("Missing ADOExt webview data.");return JSON.parse(i.textContent)}function $e(i){Ne().postMessage(i)}var O=class extends m{constructor(){super(...arguments);this.builds=[];this.emptyLabel="No builds found."}render(){return this.builds.length===0?n`<p class="empty">${this.emptyLabel}</p>`:n`${this.builds.map(e=>this.renderBuild(e))}`}renderBuild(e){let s=[e.definitionName,e.requestedFor,e.startTime].filter(Boolean),o=this.statusClass(e.statusKind);return n`<div class="build-item">
+            <span class="build-status ${o}">${e.statusLabel}</span>
+            <span class="build-name" title=${e.buildNumber}>${e.buildNumber}</span>
+            ${s.length>0?n`<span class="build-meta" title=${s.join(" - ")}>${s.join(" - ")}</span>`:d}
+            ${e.id>0?n`<button type="button" @click=${()=>this.openBuild(e.id)}>Open</button>`:d}
+        </div>`}statusClass(e){switch(e){case"succeeded":return"build-status-succeeded";case"failed":return"build-status-failed";case"inprogress":return"build-status-inprogress";default:return"build-status-other"}}openBuild(e){this.dispatchEvent(new CustomEvent("adoext-open-build",{bubbles:!0,composed:!0,detail:{buildId:e}}))}};O.properties={builds:{attribute:"builds-json",converter:{fromAttribute(e){if(!e)return[];try{let s=JSON.parse(e);return Array.isArray(s)?s:[]}catch{return[]}}}},emptyLabel:{attribute:"empty-label"}},O.styles=k`
         :host {
             display: block;
         }
@@ -726,186 +99,77 @@
                 white-space: normal;
             }
         }
-    `;
-  customElements.define("ado-build-list", AdoBuildList);
-
-  // src/views/webview/prDetails.ts
-  var AdoPrDetailsApp = class extends i4 {
-    constructor() {
-      super(...arguments);
-      this.data = readInitialData();
-      this._modalMode = null;
-      this._mergeStrategy = 1;
-      this._deleteSourceBranch = true;
-      this._transitionWorkItems = true;
-      this._mergeCommitMessage = "";
-      this.openCompleteModal = () => {
-        this._mergeCommitMessage = `Merged PR ${this.data.prId}: ${this.data.title}`;
-        this._modalMode = "complete";
-      };
-      this.openAutoCompleteModal = () => {
-        this._mergeCommitMessage = `Merged PR ${this.data.prId}: ${this.data.title}`;
-        this._modalMode = "autoComplete";
-      };
-      this.closeModal = () => {
-        this._modalMode = null;
-      };
-      this.onOverlayClick = () => {
-        this.closeModal();
-      };
-      this.onMergeStrategyChange = (e4) => {
-        this._mergeStrategy = Number(e4.target.value);
-      };
-      this.onCommitMsgInput = (e4) => {
-        this._mergeCommitMessage = e4.target.value;
-      };
-      this.onDeleteBranchChange = (e4) => {
-        this._deleteSourceBranch = e4.target.checked;
-      };
-      this.onTransitionWiChange = (e4) => {
-        this._transitionWorkItems = e4.target.checked;
-      };
-      this.confirmModal = () => {
-        const msg = {
-          mergeStrategy: this._mergeStrategy,
-          deleteSourceBranch: this._deleteSourceBranch,
-          transitionWorkItems: this._transitionWorkItems,
-          mergeCommitMessage: this._mergeCommitMessage
-        };
-        if (this._modalMode === "complete") {
-          this.send({ type: "completePr", ...msg });
-        } else if (this._modalMode === "autoComplete") {
-          this.send({ type: "setAutoComplete", ...msg });
-        }
-        this._modalMode = null;
-      };
-      this.toggleResolvedThreads = () => {
-        this.data = {
-          ...this.data,
-          showResolvedThreads: !this.data.showResolvedThreads
-        };
-        this.send({ type: "setShowResolvedThreads", showResolved: this.data.showResolvedThreads });
-      };
-      this.addComment = () => {
-        const input = this.renderRoot.querySelector("#new-comment");
-        const content = input?.value.trim();
-        if (!content) {
-          return;
-        }
-        this.send({ type: "addComment", content });
-        if (input) {
-          input.value = "";
-        }
-      };
-      this.onOpenBuild = (event) => {
-        const buildId = Number(event.detail?.buildId);
-        if (Number.isFinite(buildId) && buildId > 0) {
-          this.send({ type: "openBuild", buildId });
-        }
-      };
-      this.openTestRun = (runId) => {
-        if (Number.isFinite(runId) && runId > 0) {
-          this.send({ type: "openTestRun", runId });
-        }
-      };
-      this.copyFailureSummary = (testResults) => {
-        const failures = testResults.failures ?? [];
-        if (testResults.failedTests === 0) {
-          return;
-        }
-        const lines = failures.length > 0 ? [
-          `Test failures (${failures.length}${failures.length < testResults.failedTests ? ` of ${testResults.failedTests}` : ""})`,
-          ...failures.map((failure) => {
-            const location = [failure.buildLabel, failure.runName].filter(Boolean).join(" \xB7 ");
-            const msg = failure.errorMessageSnippet ? `
-  ${failure.errorMessageSnippet.split("\n")[0]}` : "";
-            return `- ${failure.testName}${location ? ` (${location})` : ""}${msg}`;
-          })
-        ] : [
-          `Test failures (${testResults.failedTests})`,
-          ...testResults.runs.filter((run) => run.failedTests > 0).map((run) => `- ${run.runName}: ${run.failedTests} failing test${run.failedTests === 1 ? "" : "s"}${run.buildLabel ? ` (${run.buildLabel})` : ""}`)
-        ];
-        this.send({ type: "copyText", text: lines.join("\n") });
-      };
-    }
-    render() {
-      return b2`<main class="shell">
+    `;customElements.define("ado-build-list",O);var H=class extends m{constructor(){super(...arguments);this.data=fe();this._modalMode=null;this._mergeStrategy=1;this._deleteSourceBranch=!0;this._transitionWorkItems=!0;this._mergeCommitMessage="";this.openCompleteModal=()=>{this._mergeCommitMessage=`Merged PR ${this.data.prId}: ${this.data.title}`,this._modalMode="complete"};this.openAutoCompleteModal=()=>{this._mergeCommitMessage=`Merged PR ${this.data.prId}: ${this.data.title}`,this._modalMode="autoComplete"};this.closeModal=()=>{this._modalMode=null};this.onOverlayClick=()=>{this.closeModal()};this.onMergeStrategyChange=e=>{this._mergeStrategy=Number(e.target.value)};this.onCommitMsgInput=e=>{this._mergeCommitMessage=e.target.value};this.onDeleteBranchChange=e=>{this._deleteSourceBranch=e.target.checked};this.onTransitionWiChange=e=>{this._transitionWorkItems=e.target.checked};this.confirmModal=()=>{let e={mergeStrategy:this._mergeStrategy,deleteSourceBranch:this._deleteSourceBranch,transitionWorkItems:this._transitionWorkItems,mergeCommitMessage:this._mergeCommitMessage};this._modalMode==="complete"?this.send({type:"completePr",...e}):this._modalMode==="autoComplete"&&this.send({type:"setAutoComplete",...e}),this._modalMode=null};this.toggleResolvedThreads=()=>{this.data={...this.data,showResolvedThreads:!this.data.showResolvedThreads},this.send({type:"setShowResolvedThreads",showResolved:this.data.showResolvedThreads})};this.addComment=()=>{let e=this.renderRoot.querySelector("#new-comment"),s=e?.value.trim();s&&(this.send({type:"addComment",content:s}),e&&(e.value=""))};this.onOpenBuild=e=>{let s=Number(e.detail?.buildId);Number.isFinite(s)&&s>0&&this.send({type:"openBuild",buildId:s})};this.openTestRun=e=>{Number.isFinite(e)&&e>0&&this.send({type:"openTestRun",runId:e})};this.copyFailureSummary=e=>{let s=e.failures??[];if(e.failedTests===0)return;let o=s.length>0?[`Test failures (${s.length}${s.length<e.failedTests?` of ${e.failedTests}`:""})`,...s.map(r=>{let a=[r.buildLabel,r.runName].filter(Boolean).join(" \xB7 "),p=r.errorMessageSnippet?`
+  ${r.errorMessageSnippet.split(`
+`)[0]}`:"";return`- ${r.testName}${a?` (${a})`:""}${p}`})]:[`Test failures (${e.failedTests})`,...e.runs.filter(r=>r.failedTests>0).map(r=>`- ${r.runName}: ${r.failedTests} failing test${r.failedTests===1?"":"s"}${r.buildLabel?` (${r.buildLabel})`:""}`)];this.send({type:"copyText",text:o.join(`
+`)})}}render(){return n`<main class="shell">
             <div class="toolbar">
-                <button class="btn-primary" @click=${() => this.send({ type: "openDiff" })}>View Diff</button>
+                <button class="btn-primary" @click=${()=>this.send({type:"openDiff"})}>View Diff</button>
                 <div class="review-actions" role="group" aria-label="Review actions">
-                    ${this.data.reviewActions.map((action) => b2`<button class="btn-secondary" @click=${() => this.send({ type: "setVote", vote: action.vote })}>${action.label}</button>`)}
+                    ${this.data.reviewActions.map(e=>n`<button class="btn-secondary" @click=${()=>this.send({type:"setVote",vote:e.vote})}>${e.label}</button>`)}
                 </div>
                 ${this.renderCompletionButtons()}
-                <button class="btn-secondary" @click=${() => this.send({ type: "openInBrowser" })}>Open in Browser</button>
+                <button class="btn-secondary" @click=${()=>this.send({type:"openInBrowser"})}>Open in Browser</button>
             </div>
-            <h1>PR #${this.data.prId}: ${this.data.title}${this.data.isDraft ? b2`<span class="badge draft">Draft</span>` : A}</h1>
+            <h1>PR #${this.data.prId}: ${this.data.title}${this.data.isDraft?n`<span class="badge draft">Draft</span>`:d}</h1>
             <div class="meta"><strong>${this.data.author}</strong> opened on ${this.data.createdDate} · <code>${this.data.sourceBranch}</code> -> <code>${this.data.targetBranch}</code></div>
             <section class="section"><h2>Description</h2><pre class="description">${this.data.description}</pre></section>
-            ${this.data.reviewers.length > 0 ? b2`<section class="section"><h2>Reviewers</h2><ul class="reviewers">${this.data.reviewers.map((reviewer) => b2`<li><span class="vote ${reviewer.voteClass}">${reviewer.voteLabel}</span>${reviewer.displayName}</li>`)}</ul></section>` : A}
-            ${this.renderRows("Branch Status", this.data.branchStatuses)}
-            ${this.renderRows("Build & Policy Status", this.data.checks)}
+            ${this.data.reviewers.length>0?n`<section class="section"><h2>Reviewers</h2><ul class="reviewers">${this.data.reviewers.map(e=>n`<li><span class="vote ${e.voteClass}">${e.voteLabel}</span>${e.displayName}</li>`)}</ul></section>`:d}
+            ${this.renderRows("Branch Status",this.data.branchStatuses)}
+            ${this.renderRows("Build & Policy Status",this.data.checks)}
             ${this.renderTestResults(this.data.testResults)}
             <section class="section"><h2>Builds</h2><ado-build-list .builds=${this.data.builds} empty-label="No builds found." @adoext-open-build=${this.onOpenBuild}></ado-build-list></section>
             <section class="section"><h2>Comment Threads</h2>${this.renderThreads()}</section>
             <section class="section"><h2>Add Comment</h2><div class="new-comment-form"><textarea id="new-comment" rows="3" placeholder="Write a comment..."></textarea><div><button class="btn-primary" @click=${this.addComment}>Add Comment</button></div></div></section>
-            ${this._modalMode ? this.renderModal() : A}
-        </main>`;
-    }
-    renderTestResults(testResults) {
-      if (!testResults) {
-        return b2`
+            ${this._modalMode?this.renderModal():d}
+        </main>`}renderTestResults(e){if(!e)return n`
                 <section class="section">
                     <h2>Test Results</h2>
                     <p class="empty">No test results found.</p>
                 </section>
-            `;
-      }
-      const failures = testResults.failures ?? [];
-      const runs = testResults.runs ?? [];
-      const hasPendingRuns = runs.some((run) => run.statusClass === "check-pending");
-      return b2`
+            `;let s=e.failures??[],o=e.runs??[],r=o.some(a=>a.statusClass==="check-pending");return n`
             <section class="section">
                 <h2>Test Results</h2>
                 <div class="test-summary">
-                    <span>Total: ${testResults.totalTests}</span>
-                    <span>Passed: ${testResults.passedTests}</span>
-                    <span>Failed: ${testResults.failedTests}</span>
-                    <span>Skipped: ${testResults.skippedTests}</span>
-                    ${testResults.durationLabel ? b2`<span>Duration: ${testResults.durationLabel}</span>` : A}
+                    <span>Total: ${e.totalTests}</span>
+                    <span>Passed: ${e.passedTests}</span>
+                    <span>Failed: ${e.failedTests}</span>
+                    <span>Skipped: ${e.skippedTests}</span>
+                    ${e.durationLabel?n`<span>Duration: ${e.durationLabel}</span>`:d}
                 </div>
                 <div class="toolbar">
-                    ${testResults.failedTests > 0 ? b2`<button class="btn-secondary" @click=${() => this.copyFailureSummary(testResults)}>Copy Failure Summary</button>` : A}
+                    ${e.failedTests>0?n`<button class="btn-secondary" @click=${()=>this.copyFailureSummary(e)}>Copy Failure Summary</button>`:d}
                 </div>
-                ${runs.length === 0 ? b2`<p class="empty">No test runs found.</p>` : b2`
+                ${o.length===0?n`<p class="empty">No test runs found.</p>`:n`
                         <ul class="test-run-list">
-                            ${runs.map((run) => b2`
+                            ${o.map(a=>n`
                                 <li class="test-run">
-                                    <span class="check-state ${run.statusClass} test-run-status">${run.statusLabel}</span>
-                                    <span class="test-run-name">${run.runName}</span>
-                                    <span class="test-counts">${run.passedTests}P / ${run.failedTests}F / ${run.skippedTests}S · ${run.totalTests} total${run.durationLabel ? b2` · ${run.durationLabel}` : A}</span>
-                                    <button class="btn-secondary" @click=${() => this.openTestRun(run.runId)}>Open Run</button>
-                                    ${run.buildId ? b2`<button class="btn-secondary" @click=${() => this.send({ type: "openBuild", buildId: run.buildId })}>Open Build</button>` : A}
+                                    <span class="check-state ${a.statusClass} test-run-status">${a.statusLabel}</span>
+                                    <span class="test-run-name">${a.runName}</span>
+                                    <span class="test-counts">${a.passedTests}P / ${a.failedTests}F / ${a.skippedTests}S · ${a.totalTests} total${a.durationLabel?n` · ${a.durationLabel}`:d}</span>
+                                    <button class="btn-secondary" @click=${()=>this.openTestRun(a.runId)}>Open Run</button>
+                                    ${a.buildId?n`<button class="btn-secondary" @click=${()=>this.send({type:"openBuild",buildId:a.buildId})}>Open Build</button>`:d}
                                 </li>
                             `)}
                         </ul>
                     `}
-                ${testResults.failureDetailsNotice ? b2`<p class="test-note">${testResults.failureDetailsNotice}</p>` : A}
-                ${testResults.failedTests === 0 ? b2`<p class="empty">${hasPendingRuns ? "No failing tests reported yet." : "No failing tests."}</p>` : failures.length === 0 ? b2`<p class="empty">Failing tests were detected, but detailed failure records were unavailable.</p>` : b2`
+                ${e.failureDetailsNotice?n`<p class="test-note">${e.failureDetailsNotice}</p>`:d}
+                ${e.failedTests===0?n`<p class="empty">${r?"No failing tests reported yet.":"No failing tests."}</p>`:s.length===0?n`<p class="empty">Failing tests were detected, but detailed failure records were unavailable.</p>`:n`
                         <h3>Failed Tests</h3>
                         <ul class="test-failure-list">
-                            ${failures.map((failure) => b2`
+                            ${s.map(a=>n`
                                 <li>
                                     <details class="test-failure">
                                         <summary>
-                                            <span class="test-failure-name">${failure.testName}</span>
-                                            <span class="test-failure-meta">${failure.buildLabel ? `${failure.buildLabel} \xB7 ` : ""}${failure.runName}</span>
+                                            <span class="test-failure-name">${a.testName}</span>
+                                            <span class="test-failure-meta">${a.buildLabel?`${a.buildLabel} \xB7 `:""}${a.runName}</span>
                                         </summary>
                                         <div class="test-failure-body">
-                                            ${failure.errorMessageSnippet ? b2`<h3>Error</h3><pre>${failure.errorMessageSnippet}</pre>` : b2`<p class="empty">No error message provided.</p>`}
-                                            ${failure.stackTraceSnippet ? b2`<h3>Stack Trace</h3><pre>${failure.stackTraceSnippet}</pre>` : A}
+                                            ${a.errorMessageSnippet?n`<h3>Error</h3><pre>${a.errorMessageSnippet}</pre>`:n`<p class="empty">No error message provided.</p>`}
+                                            ${a.stackTraceSnippet?n`<h3>Stack Trace</h3><pre>${a.stackTraceSnippet}</pre>`:d}
                                             <div class="toolbar">
-                                                <button class="btn-secondary" @click=${() => this.openTestRun(failure.runId)}>Open Run</button>
-                                                ${failure.buildId ? b2`<button class="btn-secondary" @click=${() => this.send({ type: "openBuild", buildId: failure.buildId })}>Open Build</button>` : A}
+                                                <button class="btn-secondary" @click=${()=>this.openTestRun(a.runId)}>Open Run</button>
+                                                ${a.buildId?n`<button class="btn-secondary" @click=${()=>this.send({type:"openBuild",buildId:a.buildId})}>Open Build</button>`:d}
                                             </div>
                                         </div>
                                     </details>
@@ -914,84 +178,48 @@
                         </ul>
                     `}
             </section>
-        `;
-    }
-    renderRows(title, rows) {
-      if (rows.length === 0) {
-        return A;
-      }
-      return b2`<section class="section"><h2>${title}</h2><ul class="checks-list">${rows.map((row) => b2`<li><span class="check-state ${row.badge.className}">${row.badge.label}</span><span class="check-name">${row.name}</span>${row.description ? b2`<span class="check-desc">${row.description}</span>` : A}</li>`)}</ul></section>`;
-    }
-    renderThreads() {
-      const resolvedCount = this.data.threads.filter((thread) => thread.isResolved).length;
-      const visibleThreads = this.data.showResolvedThreads ? this.data.threads : this.data.threads.filter((thread) => !thread.isResolved);
-      return b2`
+        `}renderRows(e,s){return s.length===0?d:n`<section class="section"><h2>${e}</h2><ul class="checks-list">${s.map(o=>n`<li><span class="check-state ${o.badge.className}">${o.badge.label}</span><span class="check-name">${o.name}</span>${o.description?n`<span class="check-desc">${o.description}</span>`:d}</li>`)}</ul></section>`}renderThreads(){let e=this.data.threads.filter(o=>o.isResolved).length,s=this.data.showResolvedThreads?this.data.threads:this.data.threads.filter(o=>!o.isResolved);return n`
             <div class="toolbar">
                 <button class="btn-secondary" @click=${this.toggleResolvedThreads}>
-                    ${this.data.showResolvedThreads ? "Hide resolved threads" : `Show resolved threads (${resolvedCount})`}
+                    ${this.data.showResolvedThreads?"Hide resolved threads":`Show resolved threads (${e})`}
                 </button>
             </div>
-            ${visibleThreads.length === 0 ? b2`<p class="empty">No comment threads.</p>` : b2`${visibleThreads.map((thread) => this.renderThread(thread))}`}
-        `;
-    }
-    renderThread(thread) {
-      return b2`<article class="thread ${thread.isResolved ? "resolved" : ""} ${thread.isToolThread ? "tool-thread" : ""}">
+            ${s.length===0?n`<p class="empty">No comment threads.</p>`:n`${s.map(o=>this.renderThread(o))}`}
+        `}renderThread(e){return n`<article class="thread ${e.isResolved?"resolved":""} ${e.isToolThread?"tool-thread":""}">
             <div class="thread-header">
                 <div class="thread-meta">
-                    <span class="thread-status">${thread.statusLabel}</span>
-                    ${thread.isToolThread ? b2`<span class="bot-badge">Bot</span>` : A}
+                    <span class="thread-status">${e.statusLabel}</span>
+                    ${e.isToolThread?n`<span class="bot-badge">Bot</span>`:d}
                 </div>
-                <button class="btn-secondary" @click=${() => this.setThreadStatus(thread)}>${thread.isResolved ? "Reopen" : "Resolve"}</button>
+                <button class="btn-secondary" @click=${()=>this.setThreadStatus(e)}>${e.isResolved?"Reopen":"Resolve"}</button>
             </div>
-            ${thread.comments.map((comment) => this.renderComment(comment))}
-            ${this.renderReplySection(thread)}
-        </article>`;
-    }
-    renderComment(comment) {
-      return b2`<div class="comment ${comment.isTool ? "tool" : ""}">
+            ${e.comments.map(s=>this.renderComment(s))}
+            ${this.renderReplySection(e)}
+        </article>`}renderComment(e){return n`<div class="comment ${e.isTool?"tool":""}">
             <div class="comment-author">
-                ${comment.author}
-                ${comment.isTool ? b2`<span class="bot-badge">Bot</span>` : A}
+                ${e.author}
+                ${e.isTool?n`<span class="bot-badge">Bot</span>`:d}
             </div>
-            <div class="comment-content">${comment.content}</div>
-        </div>`;
-    }
-    renderReplySection(thread) {
-      const replyForm = b2`<div class="reply-form">
-            <textarea id="reply-${thread.id}" rows="2" placeholder="Reply..."></textarea>
-            <button class="btn-primary" @click=${() => this.reply(thread.id)}>Reply</button>
-        </div>`;
-      return thread.isToolThread ? b2`<details class="reply-disclosure"><summary>Reply (expand)</summary>${replyForm}</details>` : replyForm;
-    }
-    renderCompletionButtons() {
-      if (!this.data.canComplete) {
-        return A;
-      }
-      if (this.data.autoCompleteSetBy) {
-        return b2`
-                <button class="btn-secondary" @click=${() => this.send({ type: "cancelAutoComplete" })}>Cancel Auto-Complete</button>
-            `;
-      }
-      return b2`
-            <button class="btn-primary" @click=${this.openCompleteModal} ?disabled=${this.data.hasConflicts || this.data.isDraft}>Complete</button>
+            <div class="comment-content">${e.content}</div>
+        </div>`}renderReplySection(e){let s=n`<div class="reply-form">
+            <textarea id="reply-${e.id}" rows="2" placeholder="Reply..."></textarea>
+            <button class="btn-primary" @click=${()=>this.reply(e.id)}>Reply</button>
+        </div>`;return e.isToolThread?n`<details class="reply-disclosure"><summary>Reply (expand)</summary>${s}</details>`:s}renderCompletionButtons(){return this.data.canComplete?this.data.autoCompleteSetBy?n`
+                <button class="btn-secondary" @click=${()=>this.send({type:"cancelAutoComplete"})}>Cancel Auto-Complete</button>
+            `:n`
+            <button class="btn-primary" @click=${this.openCompleteModal} ?disabled=${this.data.hasConflicts||this.data.isDraft}>Complete</button>
             <button class="btn-secondary" @click=${this.openAutoCompleteModal} ?disabled=${this.data.isDraft}>Set Auto-Complete</button>
-        `;
-    }
-    renderModal() {
-      const isComplete = this._modalMode === "complete";
-      const title = isComplete ? "Complete Pull Request" : "Set Auto-Complete";
-      const confirmLabel = isComplete ? "Complete Merge" : "Set Auto-Complete";
-      return b2`
+        `:d}renderModal(){let e=this._modalMode==="complete",s=e?"Complete Pull Request":"Set Auto-Complete",o=e?"Complete Merge":"Set Auto-Complete";return n`
             <div class="modal-overlay" @click=${this.onOverlayClick}>
-                <div class="modal" @click=${(e4) => e4.stopPropagation()}>
-                    <h2>${title}</h2>
+                <div class="modal" @click=${r=>r.stopPropagation()}>
+                    <h2>${s}</h2>
                     <div class="modal-field">
                         <label>Merge Type</label>
                         <select @change=${this.onMergeStrategyChange}>
-                            <option value="1" ?selected=${this._mergeStrategy === 1}>Merge (no fast-forward)</option>
-                            <option value="2" ?selected=${this._mergeStrategy === 2}>Squash commit</option>
-                            <option value="3" ?selected=${this._mergeStrategy === 3}>Rebase and fast-forward</option>
-                            <option value="4" ?selected=${this._mergeStrategy === 4}>Semi-linear merge (rebase + merge commit)</option>
+                            <option value="1" ?selected=${this._mergeStrategy===1}>Merge (no fast-forward)</option>
+                            <option value="2" ?selected=${this._mergeStrategy===2}>Squash commit</option>
+                            <option value="3" ?selected=${this._mergeStrategy===3}>Rebase and fast-forward</option>
+                            <option value="4" ?selected=${this._mergeStrategy===4}>Semi-linear merge (rebase + merge commit)</option>
                         </select>
                     </div>
                     <div class="modal-field">
@@ -1006,46 +234,18 @@
                         <input type="checkbox" .checked=${this._transitionWorkItems} @change=${this.onTransitionWiChange}>
                         Complete associated work items
                     </label>
-                    ${this.data.associatedWorkItems.length > 0 ? b2`
+                    ${this.data.associatedWorkItems.length>0?n`
                         <ul class="modal-wi-list">
-                            ${this.data.associatedWorkItems.map((wi) => b2`<li>#${wi.id}: ${wi.title}</li>`)}
+                            ${this.data.associatedWorkItems.map(r=>n`<li>#${r.id}: ${r.title}</li>`)}
                         </ul>
-                    ` : A}
+                    `:d}
                     <div class="modal-actions">
                         <button class="btn-secondary" @click=${this.closeModal}>Cancel</button>
-                        <button class="${isComplete ? "btn-primary" : "btn-primary"}" @click=${this.confirmModal}>${confirmLabel}</button>
+                        <button class="${"btn-primary"}" @click=${this.confirmModal}>${o}</button>
                     </div>
                 </div>
             </div>
-        `;
-    }
-    reply(threadId) {
-      const input = this.renderRoot.querySelector(`#reply-${threadId}`);
-      const content = input?.value.trim();
-      if (!content) {
-        return;
-      }
-      this.send({ type: "reply", threadId, content });
-      if (input) {
-        input.value = "";
-      }
-    }
-    setThreadStatus(thread) {
-      this.send({ type: "setStatus", threadId: thread.id, status: thread.isResolved ? 1 : 2 });
-    }
-    send(message) {
-      postMessage(message);
-    }
-  };
-  AdoPrDetailsApp.properties = {
-    data: { state: true },
-    _modalMode: { state: true },
-    _mergeStrategy: { state: true },
-    _deleteSourceBranch: { state: true },
-    _transitionWorkItems: { state: true },
-    _mergeCommitMessage: { state: true }
-  };
-  AdoPrDetailsApp.styles = i`
+        `}reply(e){let s=this.renderRoot.querySelector(`#reply-${e}`),o=s?.value.trim();o&&(this.send({type:"reply",threadId:e,content:o}),s&&(s.value=""))}setThreadStatus(e){this.send({type:"setStatus",threadId:e.id,status:e.isResolved?1:2})}send(e){$e(e)}};H.properties={data:{state:!0},_modalMode:{state:!0},_mergeStrategy:{state:!0},_deleteSourceBranch:{state:!0},_transitionWorkItems:{state:!0},_mergeCommitMessage:{state:!0}},H.styles=k`
         :host {
             display: block;
             --tool-thread-textarea-min-height: 28px;
@@ -1132,6 +332,4 @@
         .btn-danger:hover { opacity: 0.9; }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
         @media (max-width: 620px) { .reply-form { flex-direction: column; } .checks-list li { align-items: flex-start; flex-direction: column; } }
-    `;
-  customElements.define("ado-pr-details-app", AdoPrDetailsApp);
-})();
+    `;customElements.define("ado-pr-details-app",H);})();
