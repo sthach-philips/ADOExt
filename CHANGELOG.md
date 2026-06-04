@@ -5,6 +5,7 @@
 ### Changed
 
 - **Lazy panel loader architecture**: Route PR Details, Planning, and Pipeline Run Details panel imports through a shared cached loader so command and configuration refresh paths observe a consistent loaded-or-not module state.
+- **PR thread fetch deduplication**: Share a short-lived thread cache between PR tree and notification polling to reuse freshly fetched threads, coalesce concurrent fetches per PR, and clear cached entries on PR refresh.
 
 ## 1.7.0 — 2026-05-15
 
