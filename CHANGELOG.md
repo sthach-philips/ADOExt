@@ -13,6 +13,9 @@
 ### Fixed
 
 - **Work item hover quick action**: Encode command URI arguments in array form so `View Details` hover links invoke `adoext.viewWorkItemDetailsById` correctly.
+- **Webview build output size**: Minify webview bundles for non-watch builds to reduce shipped panel script size.
+- **Pipeline timeline cache growth**: Replace the unbounded timeline cache with a bounded cache (200 entries) to avoid memory growth during long sessions.
+- **Background polling overhead**: Skip notification polling while the VS Code window is unfocused to reduce unnecessary Azure DevOps API calls.
 
 ## 1.7.0 — 2026-05-15
 
