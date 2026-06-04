@@ -284,6 +284,168 @@ const PLANNING_DATA = {
     ],
 };
 
+const STATIC_SCREENSHOT_BASE_STYLE = `
+body {
+        margin: 0;
+        background: #1e1e1e;
+        color: #d4d4d4;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+.wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 28px;
+}
+.title {
+        margin: 0 0 18px;
+        font-size: 24px;
+        font-weight: 700;
+}
+.sub {
+        margin: 0 0 20px;
+        color: #9fa6ad;
+        font-size: 14px;
+}
+.grid {
+        display: grid;
+        gap: 16px;
+}
+.card {
+        border: 1px solid #2f343a;
+        border-radius: 12px;
+        background: #23272e;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        padding: 16px;
+}
+.label {
+        color: #8aa0b8;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 8px;
+}
+.mono {
+        font-family: Consolas, 'Courier New', monospace;
+        background: #1b1f24;
+        border: 1px solid #2c3138;
+        border-radius: 8px;
+        padding: 10px 12px;
+        white-space: pre-wrap;
+        line-height: 1.45;
+}
+.pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        margin-right: 8px;
+        font-size: 12px;
+        border: 1px solid #3a4048;
+        background: #2c3138;
+}
+.ok { border-color: #2f6f4f; background: #204733; }
+.warn { border-color: #7b5c2f; background: #4d3b1f; }
+.accent { color: #4ea1ff; }
+`;
+
+function staticScreenshotPage(title: string, subtitle: string, bodyHtml: string): string {
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>${title}</title>
+<style>${STATIC_SCREENSHOT_BASE_STYLE}</style>
+</head>
+<body>
+    <div class="wrap">
+        <h1 class="title">${title}</h1>
+        <p class="sub">${subtitle}</p>
+        ${bodyHtml}
+    </div>
+</body>
+</html>`;
+}
+
+router.get('/screenshots/create-work-item', (_req, res) => {
+        res.setHeader('Content-Type', 'text/html');
+        res.send(staticScreenshotPage(
+                'Create Work Item From Code',
+                'From selection, TODO code actions, and file context capture.',
+                `<div class="grid">
+                    <div class="card">
+                        <div class="label">Source</div>
+                        <div class="mono">// TODO: Replace in-memory token store with Redis\n// to prevent auth resets during deployments.</div>
+                    </div>
+                    <div class="card">
+                        <div class="label">Code Action</div>
+                        <div><span class="pill accent">Create Azure DevOps Work Item from TODO</span><span class="pill">Create from Selection</span></div>
+                    </div>
+                    <div class="card">
+                        <div class="label">Generated Context</div>
+                        <div class="mono">Title: Replace in-memory token store with Redis\nType: Task\nFile: src/auth/sessionStore.ts:42\nDescription:\n- Captured from editor TODO\n- Includes surrounding context lines</div>
+                    </div>
+                </div>`
+        ));
+});
+
+router.get('/screenshots/smart-completions', (_req, res) => {
+        res.setHeader('Content-Type', 'text/html');
+        res.send(staticScreenshotPage(
+                'Smart Code Completions',
+                'Reference work items with # / AB# and teammates with @ mention completion.',
+                `<div class="grid">
+                    <div class="card">
+                        <div class="label">Editor Input</div>
+                        <div class="mono">This change addresses AB#10 and mentions @ali</div>
+                    </div>
+                    <div class="card">
+                        <div class="label">Completion Suggestions</div>
+                        <div class="mono">AB#101  Bug        Login page crashes on Safari 17\nAB#104  Task       Add Redis cache for user sessions\nAB#106  User Story Admin can view audit logs\n@Alice Alvarez  alice@acme.dev\n@Alina Becker   alina@acme.dev</div>
+                    </div>
+                </div>`
+        ));
+});
+
+router.get('/screenshots/hover-cards', (_req, res) => {
+        res.setHeader('Content-Type', 'text/html');
+        res.send(staticScreenshotPage(
+                'Hover Cards For ADO References',
+                'Inline work item and PR context with direct actions.',
+                `<div class="grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="card">
+                        <div class="label">AB#101</div>
+                        <div class="mono">Bug: Login page crashes on Safari 17\nState: Active\nAssigned To: Alice Alvarez\nScope: mockorg/Acme Platform\n\n[Open in Browser] [View Details]</div>
+                    </div>
+                    <div class="card">
+                        <div class="label">PR #201</div>
+                        <div class="mono">feat: add Redis session cache\nStatus: Active\nRepository: platform-api\nAuthor: Bob Baker\n\n[Open in Browser]</div>
+                    </div>
+                </div>`
+        ));
+});
+
+router.get('/screenshots/multi-account', (_req, res) => {
+        res.setHeader('Content-Type', 'text/html');
+        res.send(staticScreenshotPage(
+                'Multi-Account / Multi-Organization Setup',
+                'Use multiple Microsoft accounts and aggregate across org/project scopes.',
+                `<div class="grid">
+                    <div class="card">
+                        <div class="label">Signed-in Accounts</div>
+                        <div class="mono">alice@acme.dev  (active)\ncarol@contoso.dev</div>
+                    </div>
+                    <div class="card">
+                        <div class="label">Selected Organizations</div>
+                        <div><span class="pill ok">mockorg</span><span class="pill">contoso</span></div>
+                    </div>
+                    <div class="card">
+                        <div class="label">Project Scopes</div>
+                        <div class="mono">mockorg / Acme Platform\nmockorg / Shared Services\ncontoso / Storefront</div>
+                    </div>
+                </div>`
+        ));
+});
+
 router.get('/screenshots/pr-details', (_req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.send(scaffoldPage('PR #201 – ADOExt', 'ado-pr-details-app', '/ext-media/prDetails.js', PR_DETAILS_DATA));
@@ -313,6 +475,10 @@ router.get('/screenshots', (_req, res) => {
 <a href="/screenshots/pipeline-run">Pipeline Run Details (Build #20260518.1 — failed)</a>
 <a href="/screenshots/work-item">Work Item Details (#101 Bug)</a>
 <a href="/screenshots/planning">Backlog Planning</a>
+<a href="/screenshots/create-work-item">Create Work Item From Code</a>
+<a href="/screenshots/smart-completions">Smart Code Completions</a>
+<a href="/screenshots/hover-cards">Hover Cards</a>
+<a href="/screenshots/multi-account">Multi-Account / Multi-Org Setup</a>
 </body></html>`);
 });
 

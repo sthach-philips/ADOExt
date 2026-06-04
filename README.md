@@ -2,6 +2,12 @@
 
 A full-featured Azure DevOps integration for Visual Studio Code, bringing the power of ADO directly into your editor. Manage work items, pull requests, builds, and team collaboration—all without leaving VS Code.
 
+## UI Preview
+
+<img src="docs/images/pr-details.png" alt="Pull request details panel" width="100%" />
+
+_PR details and review workflow directly in VS Code._
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for the full release history.
@@ -11,6 +17,11 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 ## ✨ Key Features
 
 ### 📋 **Work Item Management**
+
+<img src="docs/images/work-item-details.png" alt="Work item details panel" width="100%" />
+
+- _Detailed work item editing, discussion, and linked build context in one panel._
+
 - **Browse & Filter** — View work items assigned to you, created by you, or across your entire portfolio
 - **Multi-Org Aggregation** — Work items aggregate seamlessly across selected organizations and projects, grouped by project and state
 - **Regex Filtering & Sorting** — Filter work items by regex pattern (ID, title) and sort by name or creation date; buttons in the Work Items view header
@@ -23,11 +34,21 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 - **State Changes** — Change work item state directly from the sidebar
 
 ### 🎯 **Create Work Items from Your Code**
+
+<img src="docs/images/create-work-item.png" alt="Create work item from code context" width="100%" />
+
+- _Turn TODOs and code selections into tracked work with captured editor context._
+
 - **From Selection** — Highlight text in the editor and run `ADOExt: Create Work Item from Selection` to create a new work item with your selected text as the title
 - **From TODO Comments** — VS Code code action (💡) appears on TODO comments; click to create a work item directly from the comment
 - **File Context** — Work items automatically include the source file path and context lines for quick reference
 
 ### 🔍 **Smart Code Completions**
+
+<img src="docs/images/smart-completions.png" alt="Smart code completions for work items and mentions" width="100%" />
+
+- _Autocomplete work item references and teammate mentions while typing in code, markdown, and commits._
+
 - **Work Item References** — Type `#` or `AB#` in markdown, plaintext, or git commits to see IntelliSense completions for recent work items
   - Shows work item ID, title, type, and state
   - Filter by typing ID digits or title keywords
@@ -37,6 +58,11 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
   - Filters by display name and email prefix
 
 ### 🎨 **Hover Cards for ADO References**
+
+<img src="docs/images/hover-cards.png" alt="Hover cards for work item and pull request references" width="100%" />
+
+- _Get instant work item and PR context from inline references, with direct action links._
+
 - **Work Item Hovers** — Hover over `AB#123` or `#123` references in any open file to see a rich detail card
   - Shows title, type, state, assignee, and project scope
   - Quick actions: Open in Browser, View Details panel
@@ -46,6 +72,11 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 - **Smart Scope Resolution** — Hovers work across multi-project setups; when ambiguous, shows the matched scope
 
 ### ✅ **Pull Request Management**
+
+<img src="docs/images/pull-request-management.png" alt="Pull request management view" width="100%" />
+
+- _Review threads, checks, test results, and merge actions in one focused PR workspace._
+
 - **Browse PRs** — View active pull requests (yours, created, assigned to you, all) aggregated across organizations/projects
 - **Regex Filtering & Sorting** — Filter PRs by regex pattern (ID, title) and sort by title or creation date; buttons in the Pull Requests view header
 - **Inline Review** — Expand PRs in the tree to see all comment threads; reply, resolve, or reopen directly from the sidebar
@@ -60,6 +91,11 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 - **PR Queries & Buckets** — Organize PRs by review state (Waiting for My Review, Created by Me, All Open) or save custom queries
 
 ### 📦 **Backlog, Sprints & Boards**
+
+<img src="docs/images/planning-backlog.png" alt="Backlog planning view" width="100%" />
+
+- _Planning views with fast filtering, state updates, and assignee-aware workflow._
+
 - **Hierarchical Backlog** — View parent/child work item relationships in a collapsible tree
 - **Sprint Planning** — Browse work grouped by sprint/iteration with drag-and-drop reordering
 - **Regex Filtering & Sorting** — Filter and sort items in Backlog and Sprint views by regex pattern or name/date (controls in the editor view toolbar)
@@ -70,6 +106,11 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 - **Linked Details** — Open any work item from planning views in the shared details panel
 
 ### 🔐 **Multi-Account & Multi-Organization**
+
+<img src="docs/images/multi-account.png" alt="Multi-account and multi-organization setup" width="100%" />
+
+- _Select multiple accounts, organizations, and project scopes for aggregated cross-team workflows._
+
 - **Built-in Auth** — Uses VS Code's Microsoft authentication (no manual token management)
 - **Multiple Accounts** — Sign in with multiple Microsoft accounts and switch seamlessly
 - **Organization Picker** — Select one or multiple organizations or all orgs in your account
@@ -77,6 +118,11 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 - **Smart Aggregation** — All views (work items, PRs) automatically aggregate across your selection
 
 ### 🏗️ **Build & Integration**
+
+<img src="docs/images/pipeline-run-details.png" alt="Pipeline run details panel" width="100%" />
+
+- _Pipeline run diagnostics, timeline details, and quick actions without leaving the editor._
+
 - **Build Summaries** — Lightweight build status cards in PR and work item detail panels
 - **Pipelines View** — Browse recent Azure Pipelines runs across selected scopes; filter/group runs, inspect timeline details, open step logs from the tree or details timeline in VS Code, and open artifacts
 - **MCP Server** — Foundry integration for AI-powered workflows and automations
