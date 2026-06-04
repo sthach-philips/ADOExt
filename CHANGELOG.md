@@ -8,6 +8,7 @@
 - **PR thread fetch deduplication**: Share a short-lived thread cache between PR tree and notification polling to reuse freshly fetched threads, coalesce concurrent fetches per PR, and clear cached entries on PR refresh.
 - **Scope fetch consolidation and TTL caching**: Centralize multi-scope provider fetch flow with a shared scope helper and add short TTL caching for work item type lookups to reduce duplicate API traffic across views.
 - **Details panel lifecycle base class**: Extract shared webview lifecycle handling into a common `PanelBase` and migrate PR, Work Item, and Pipeline Run details panels to reduce duplicated panel wiring.
+- **Declarative command registration**: Centralize extension command wiring through a shared `CommandRegistry` to reduce duplicated registration boilerplate and keep guarded/refreshing command behavior consistent.
 
 ### Fixed
 
