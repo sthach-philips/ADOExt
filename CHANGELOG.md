@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- **Lazy panel loader architecture**: Route PR Details, Planning, and Pipeline Run Details panel imports through a shared cached loader so command and configuration refresh paths observe a consistent loaded-or-not module state.
+
 ## 1.7.0 — 2026-05-15
 
 ### Added
