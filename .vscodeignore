@@ -12,6 +12,7 @@ tsconfig.webviews.json
 AGENTS.md
 package-lock.json
 node_modules/**
+mock-server/**
 out/**
 !out/extension.js
 
