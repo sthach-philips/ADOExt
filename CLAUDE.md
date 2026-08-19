@@ -5,14 +5,14 @@
 ## Build & Validate
 
 ```sh
-npm install           # install dependencies
-npm run compile       # full build (type check + esbuild)
-npm run check:extension && npm run check:webviews  # type check only (fast)
-npm run lint          # ESLint (max-warnings=0)
-npm run watch         # incremental rebuild on save
+pnpm install          # install dependencies
+pnpm run compile      # full build (type check + esbuild)
+pnpm run check:extension && pnpm run check:webviews  # type check only (fast)
+pnpm run lint         # ESLint (max-warnings=0)
+pnpm run watch        # incremental rebuild on save
 ```
 
-Always run `npm run compile` after TypeScript changes before reporting a task done.
+Always run `pnpm run compile` after TypeScript changes before reporting a task done.
 
 ## Custom Slash Commands
 
