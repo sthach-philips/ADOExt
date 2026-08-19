@@ -228,13 +228,21 @@ We welcome contributions! Please feel free to open issues or pull requests on [G
 
 ### Development Setup
 ```bash
-git clone https://github.com/CompN3rd/ADOExt
+git clone https://github.com/sthach-philips/ADOExt
 cd ADOExt
-npm install
-npm run compile      # Build extension TypeScript and webview bundles
-npm run watch        # Watch extension TypeScript
-npm run watch:webviews # Watch bundled webview assets
-code .               # Open in VS Code for testing
+pnpm install
+pnpm run compile      # Build extension TypeScript and webview bundles
+pnpm run watch        # Watch extension TypeScript
+pnpm run watch:webviews # Watch bundled webview assets
+code .                # Open in VS Code for testing
+```
+
+#### Environment (optional, for MCP server)
+
+Copy the example and fill in via [pass](https://www.passwordstore.org/) + [direnv](https://direnv.net/):
+```bash
+cp .envrc.example .envrc
+direnv allow
 ```
 
 ---
