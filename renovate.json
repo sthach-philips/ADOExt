@@ -1,0 +1,31 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "schedule:monthly",
+    ":pinVersions"
+  ],
+  "schedule": ["every 4 weeks on Monday"],
+  "packageRules": [
+    {
+      "description": "Auto-merge patch and minor updates (non-major)",
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": ["dependencies"]
+    },
+    {
+      "description": "Require manual review for major updates",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "addLabels": ["dependencies", "breaking"]
+    }
+  ],
+  "mise": {
+    "enabled": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["every 4 weeks on Monday"]
+  }
+}
