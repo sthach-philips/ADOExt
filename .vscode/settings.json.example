@@ -1,0 +1,10 @@
+{
+  "adoext.organization": "mycompany",
+  "adoext.project": "MyProject",
+  "adoext.projectsByOrganization": {
+    "mycompany": ["MyProject"]
+  },
+  "adoext.workItemQuery": "assigned",
+  "adoext.notifyOnNewPullRequestComments": true,
+  "adoext.pullRequestCommentPollIntervalSeconds": 60
+}

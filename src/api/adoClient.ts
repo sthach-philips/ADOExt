@@ -232,7 +232,8 @@ export class AdoClient {
     }
 
     private createConnection(organization: string): azdev.WebApi {
-        const baseUrl = process.env.ADO_MOCK_URL ?? 'https://dev.azure.com';
+        const baseUrl = (process.env.NODE_ENV === 'development' && process.env.ADO_MOCK_URL)
+            || 'https://dev.azure.com';
         const orgUrl = `${baseUrl}/${organization}`;
         const authHandler = azdev.getBearerHandler(this._accessToken);
         return new azdev.WebApi(orgUrl, authHandler);

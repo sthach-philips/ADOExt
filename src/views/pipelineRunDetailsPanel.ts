@@ -161,7 +161,13 @@ export class PipelineRunDetailsPanel extends PanelBase {
             }
             case 'openArtifact':
                 if (msg.url) {
-                    await vscode.env.openExternal(vscode.Uri.parse(msg.url));
+                    const url = msg.url;
+                    if (
+                        url.startsWith('https://dev.azure.com/') ||
+                        /^https:\/\/[^/]+\.visualstudio\.com\//.test(url)
+                    ) {
+                        await vscode.env.openExternal(vscode.Uri.parse(url));
+                    }
                 }
                 return;
             case 'openAgentPool': {

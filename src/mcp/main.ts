@@ -33,6 +33,13 @@ function main(): void {
         );
         process.exit(1);
     }
+    if (!/^[\w][\w.-]*$/.test(organization)) {
+        process.stderr.write(
+            'Error: Invalid organization name.\n' +
+            'ADO_ORGANIZATION must contain only alphanumeric, dot, hyphen, or underscore characters.\n'
+        );
+        process.exit(1);
+    }
 
     // Determine authentication method.
     // Priority: bearer token > PAT > interactive (browser)
