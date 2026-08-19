@@ -237,12 +237,33 @@ pnpm run watch:webviews # Watch bundled webview assets
 code .                # Open in VS Code for testing
 ```
 
-#### Environment (optional, for MCP server)
+#### First-time Setup (after install)
+
+1. Set your auth method in VS Code settings (`adoext.authMethod`):
+   - `"vscode"` -- default, uses VS Code's built-in Microsoft auth
+   - `"azcli"` -- recommended for WSL (requires `az login` first)
+   - `"msal"` -- MSAL interactive OAuth (same flow as @azure-devops/mcp)
+   - `"pat"` -- reads `AZURE_DEVOPS_PAT` from environment
+
+2. Run from the command palette:
+   - `ADOExt: Sign In`
+   - `ADOExt: Select Organization`
+   - `ADOExt: Select Project`
+
+The org/project selection is required even if you set values in `settings.json`.
+
+#### Environment (optional, for MCP server and PAT auth)
 
 Copy the example and fill in via [pass](https://www.passwordstore.org/) + [direnv](https://direnv.net/):
 ```bash
 cp .envrc.example .envrc
 direnv allow
+```
+
+For `azcli` auth, ensure you have the Azure CLI installed and run:
+```bash
+az login
+az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798  # verify ADO access
 ```
 
 ---

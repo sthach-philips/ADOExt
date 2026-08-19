@@ -5,12 +5,30 @@
   // Use "pat" to read AZURE_DEVOPS_PAT from environment (direnv + pass)
   "adoext.authMethod": "azcli",
 
+  // Org/project are set interactively via command palette on first use:
+  //   ADOExt: Select Organization -> ADOExt: Select Project
+  // These values are written automatically by those commands.
   "adoext.organization": "mycompany",
   "adoext.project": "MyProject",
   "adoext.projectsByOrganization": {
     "mycompany": ["MyProject"]
   },
+
+  // Work item queries: "assigned" | "created" | "mentioned" | "all"
   "adoext.workItemQuery": "assigned",
+
+  // Custom saved queries (shown as tabs in the Work Items view)
+  "adoext.workItemQueries": [
+    { "id": "assigned", "label": "Assigned to me", "filter": "assigned" },
+    { "id": "created", "label": "Created by me", "filter": "created" }
+  ],
+
+  // Pull request queries: "mine" | "created" | "assigned" | "all"
+  "adoext.pullRequestQueries": [
+    { "id": "mine", "label": "My PRs", "filter": "mine" },
+    { "id": "assigned", "label": "Assigned to me", "filter": "assigned" }
+  ],
+
   "adoext.notifyOnNewPullRequestComments": true,
   "adoext.pullRequestCommentPollIntervalSeconds": 60
 }
