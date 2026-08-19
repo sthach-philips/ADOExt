@@ -11,6 +11,7 @@ import { GitVersionType, VersionControlChangeType, GitStatusState, PullRequestAs
 import { BuildReason, BuildResult, BuildStatus } from 'azure-devops-node-api/interfaces/BuildInterfaces';
 import { ResultDetails, TestOutcome } from 'azure-devops-node-api/interfaces/TestInterfaces';
 import { Operation } from 'azure-devops-node-api/interfaces/common/VSSInterfaces';
+import { ADO_BASE_URL } from '../utils/adoUrls';
 import { normalizeWorkItemTypeName, workItemTypeScopeKey } from '../utils/workItemTypeIcons';
 import { TtlCache } from '../utils/ttlCache';
 import { formatAdoError } from '../utils/adoErrors';
@@ -232,7 +233,8 @@ export class AdoClient {
     }
 
     private createConnection(organization: string): azdev.WebApi {
-        const baseUrl = process.env.ADO_MOCK_URL ?? 'https://dev.azure.com';
+        const baseUrl = (process.env.NODE_ENV === 'development' && process.env.ADO_MOCK_URL)
+            || ADO_BASE_URL;
         const orgUrl = `${baseUrl}/${organization}`;
         const authHandler = azdev.getBearerHandler(this._accessToken);
         return new azdev.WebApi(orgUrl, authHandler);

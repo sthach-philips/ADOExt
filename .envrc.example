@@ -1,0 +1,8 @@
+use mise
+
+# MCP server authentication (standalone subprocess only)
+export ADO_ORGANIZATION=$(pass azure-devops/organization)
+export AZURE_DEVOPS_PAT=$(pass azure-devops/pat-personal)
+
+# Optional: restrict MCP server to specific domains
+# export ADO_MCP_DOMAINS=dev.azure.com,myorg.visualstudio.com

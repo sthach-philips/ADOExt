@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import type { WorkItem, WorkItemComment, Build } from '../api/adoClient';
 import type { AdoClient } from '../api/adoClient';
 import type { ConfigManager } from '../config/configManager';
+import { isAdoUrl } from '../utils/adoUrls';
 import { showErrorMessage, showInformationMessage, showWarningMessage } from '../utils/notifications';
 import { bundledWorkItemTypeIconFile, normalizeWorkItemTypeName } from '../utils/workItemTypeIcons';
 import { buildSummaryData } from './buildSummaryHtml';
@@ -238,13 +239,8 @@ export class WorkItemDetailsPanel extends PanelBase {
                 void vscode.commands.executeCommand('adoext.refreshBoards');
                 await this._refresh(this._client, this._config, this._workItem);
             } else if (msg.type === 'openLinkedItem' && msg.url) {
-                // Only open https://dev.azure.com/ or https://*.visualstudio.com/ URLs
-                const safeUrl = msg.url;
-                if (
-                    safeUrl.startsWith('https://dev.azure.com/') ||
-                    /^https:\/\/[^/]+\.visualstudio\.com\//.test(safeUrl)
-                ) {
-                    void vscode.env.openExternal(vscode.Uri.parse(safeUrl));
+                if (isAdoUrl(msg.url)) {
+                    void vscode.env.openExternal(vscode.Uri.parse(msg.url));
                 }
             } else if (msg.type === 'startWorking') {
                 await vscode.commands.executeCommand(
