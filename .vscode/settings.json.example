@@ -1,4 +1,10 @@
 {
+  // Auth method: "vscode" (default), "msal", "azcli", or "pat"
+  // Use "azcli" in WSL/proxy environments (requires 'az login')
+  // Use "msal" for browser-based OAuth without VS Code's auth provider
+  // Use "pat" to read AZURE_DEVOPS_PAT from environment (direnv + pass)
+  "adoext.authMethod": "azcli",
+
   "adoext.organization": "mycompany",
   "adoext.project": "MyProject",
   "adoext.projectsByOrganization": {

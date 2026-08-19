@@ -1,8 +1,11 @@
 use mise
 
-# MCP server authentication (standalone subprocess only)
+# MCP server and PAT auth method
 export ADO_ORGANIZATION=$(pass azure-devops/organization)
 export AZURE_DEVOPS_PAT=$(pass azure-devops/pat-personal)
 
 # Optional: restrict MCP server to specific domains
 # export ADO_MCP_DOMAINS=dev.azure.com,myorg.visualstudio.com
+
+# For "azcli" auth method, ensure you've run: az login
+# For "pat" auth method, AZURE_DEVOPS_PAT above is used directly by the extension

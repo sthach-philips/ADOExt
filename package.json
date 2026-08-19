@@ -825,6 +825,18 @@
     "configuration": {
       "title": "ADOExt",
       "properties": {
+        "adoext.authMethod": {
+          "type": "string",
+          "default": "vscode",
+          "enum": ["vscode", "msal", "azcli", "pat"],
+          "enumDescriptions": [
+            "VS Code built-in Microsoft authentication (default)",
+            "MSAL interactive OAuth via local browser (works in WSL/proxy environments)",
+            "Azure CLI credential (requires 'az login')",
+            "Personal Access Token from AZURE_DEVOPS_PAT environment variable"
+          ],
+          "description": "Authentication method for Azure DevOps. Use 'msal' if VS Code auth fails in WSL/proxy setups."
+        },
         "adoext.organization": {
           "type": "string",
           "default": "",
@@ -1146,6 +1158,9 @@
     "typescript": "5.9.3"
   },
   "dependencies": {
-    "azure-devops-node-api": "15.1.3"
+    "@azure/identity": "4.13.2",
+    "@azure/msal-node": "5.5.0",
+    "azure-devops-node-api": "15.1.3",
+    "open": "11.0.1"
   }
 }
