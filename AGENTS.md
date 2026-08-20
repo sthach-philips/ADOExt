@@ -58,13 +58,19 @@ See [.github/copilot-instructions.md](.github/copilot-instructions.md) for full 
 
 ```
 src/commands/      ->  command handlers (orchestration only)
-src/providers/     ->  TreeDataProviders (6 tree views)
+src/config/        ->  ConfigManager (settings), PlanningConfig (view config)
+src/providers/     ->  6 TreeDataProviders + completion, hover, scopes, caches
 src/views/         ->  webview panels + PR comment controller
 src/views/webview/ ->  Lit components compiled separately (tsconfig.webviews.json)
 src/notifications/ ->  polling + PR comment/review/status handlers
 src/utils/         ->  shared helpers (async, scope, repo context, notifications)
 src/mcp/           ->  McpServerManager (delegates to @azure-devops/mcp)
 ```
+
+Tree views (6): workItems, pullRequests, pipelines, backlog, sprints, boards.
+
+Dependency hotspots: `ConfigManager` (48 refs / 26 files), `AdoClient` (45 / 26), `notifications` (36 / 12).
+Known cycle: `adoClient.ts` <-> `configManager.ts`.
 
 ## Conventions
 
@@ -125,9 +131,9 @@ Never import host-side modules from webview files or vice versa -- the build wil
 
 **Provider refresh**: Call the provider's `refresh()` method or fire its `_onDidChangeTreeData` emitter. Do not replace provider instances.
 
-**Cross-org fetch** (`src/providers/projectScopes.ts`): Always resolve project scopes via `ProjectScopes.resolveScopes()` before making API calls. New data fetches must iterate over all resolved scopes, not a single hardcoded project.
+**Cross-org fetch** (`src/providers/projectScopes.ts`): Always resolve project scopes via `resolveProjectScopes()` before making API calls. New data fetches must iterate over all resolved scopes (or use `forEachScope()`), not a single hardcoded project.
 
-**Concurrency** (`src/utils/async.ts`): Use the existing `parallelLimit` / `mapParallelLimit` helpers when fetching across multiple orgs/projects. Do not remove concurrency bounds.
+**Concurrency** (`src/utils/async.ts`): Use the existing `mapWithConcurrencyLimit` helper when fetching across multiple orgs/projects. Do not remove concurrency bounds.
 
 **Notifications** (`src/utils/notifications.ts`): Use `showInformationMessage`, `showWarningMessage`, `showErrorMessage` from this module -- they add structured logging alongside VS Code toasts.
 
@@ -138,7 +144,7 @@ Never import host-side modules from webview files or vice versa -- the build wil
 **Tree view is empty**:
 1. Check `AuthProvider.isSignedIn` -- if false, sign-in gate is blocking.
 2. Check `ConfigManager.selectedOrganizations` -- if empty, no org is configured.
-3. Check `ProjectScopes.resolveScopes()` return value -- may be filtering out all projects.
+3. Check `resolveProjectScopes()` return value -- may be filtering out all projects.
 4. Look for uncaught errors in the provider's `getChildren()` -- wrap in try/catch and check Output panel.
 
 **API call fails silently**:
