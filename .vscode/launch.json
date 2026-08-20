@@ -12,7 +12,7 @@
         "ADO_MOCK_URL": "http://localhost:3000"
       },
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
+        "${workspaceFolder}/bin/**/*.js"
       ],
       "preLaunchTask": "preLaunch: mock (compile + server)"
     },
@@ -24,7 +24,7 @@
         "--extensionDevelopmentPath=${workspaceFolder}"
       ],
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
+        "${workspaceFolder}/bin/**/*.js"
       ],
       "preLaunchTask": "npm: install and compile"
     },
@@ -36,7 +36,7 @@
         "--extensionDevelopmentPath=${workspaceFolder}"
       ],
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
+        "${workspaceFolder}/bin/**/*.js"
       ],
       "preLaunchTask": "npm: compile"
     },
@@ -48,7 +48,7 @@
         "--extensionDevelopmentPath=${workspaceFolder}"
       ],
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
+        "${workspaceFolder}/bin/**/*.js"
       ],
       "preLaunchTask": "npm: watch"
     }

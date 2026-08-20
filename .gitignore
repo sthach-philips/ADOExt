@@ -1,5 +1,7 @@
 node_modules/
 out/
+bin/
+media/webviews/*.js
 *.vsix
 .vscode-test/
 .claude/worktrees/

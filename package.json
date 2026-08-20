@@ -21,7 +21,7 @@
     "onStartupFinished"
   ],
   "icon": "icon.png",
-  "main": "./out/extension.js",
+  "main": "./bin/extension.js",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -828,7 +828,12 @@
         "adoext.authMethod": {
           "type": "string",
           "default": "vscode",
-          "enum": ["vscode", "msal", "azcli", "pat"],
+          "enum": [
+            "vscode",
+            "msal",
+            "azcli",
+            "pat"
+          ],
           "enumDescriptions": [
             "VS Code built-in Microsoft authentication (default)",
             "MSAL interactive OAuth via local browser (works in WSL/proxy environments)",
@@ -1144,7 +1149,8 @@
     "watch:types": "tsc -watch -p ./ --noEmit",
     "watch:host": "node ./scripts/build-extension-host.js --watch",
     "watch:webviews": "node ./scripts/build-webviews.js --watch",
-    "lint": "eslint src --ext ts --max-warnings=0"
+    "lint": "eslint src --ext ts --max-warnings=0",
+    "test:compat": "node tests/bundle-compat/lowdb-cjs.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.0",
@@ -1161,6 +1167,7 @@
     "@azure/identity": "4.13.2",
     "@azure/msal-node": "5.5.0",
     "azure-devops-node-api": "15.1.3",
+    "lowdb": "^7.0.1",
     "open": "11.0.1"
   }
 }
