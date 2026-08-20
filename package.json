@@ -1362,7 +1362,8 @@
     "watch:host": "node ./scripts/build-extension-host.js --watch",
     "watch:webviews": "node ./scripts/build-webviews.js --watch",
     "lint": "eslint src --ext ts --max-warnings=0",
-    "test:compat": "node tests/bundle-compat/lowdb-cjs.mjs"
+    "test:compat": "node tests/bundle-compat/lowdb-cjs.mjs",
+    "reindex": "scip-typescript index && scip-query reindex"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.0",

@@ -6,3 +6,4 @@ media/webviews/*.js
 .vscode-test/
 .claude/worktrees/
 .envrc
+index.scip
