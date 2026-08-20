@@ -172,12 +172,42 @@
         "category": "ADOExt",
         "icon": "$(person)"
       },
-      { "command": "adoext.setPlanningAreaFilter", "title": "Filter by Area Path", "category": "ADOExt", "icon": "$(folder)" },
-      { "command": "adoext.setPlanningIterationFilter", "title": "Filter by Iteration", "category": "ADOExt", "icon": "$(milestone)" },
-      { "command": "adoext.setPlanningTypeFilter", "title": "Filter by Work Item Type", "category": "ADOExt", "icon": "$(symbol-class)" },
-      { "command": "adoext.setPlanningStateFilter", "title": "Configure Sections", "category": "ADOExt", "icon": "$(list-tree)" },
-      { "command": "adoext.setPlanningTitleFilter", "title": "Filter by Title", "category": "ADOExt", "icon": "$(search)" },
-      { "command": "adoext.setPlanningGlobalFilter", "title": "Configure Global Filter", "category": "ADOExt", "icon": "$(filter)" },
+      {
+        "command": "adoext.setPlanningAreaFilter",
+        "title": "Filter by Area Path",
+        "category": "ADOExt",
+        "icon": "$(folder)"
+      },
+      {
+        "command": "adoext.setPlanningIterationFilter",
+        "title": "Filter by Iteration",
+        "category": "ADOExt",
+        "icon": "$(milestone)"
+      },
+      {
+        "command": "adoext.setPlanningTypeFilter",
+        "title": "Filter by Work Item Type",
+        "category": "ADOExt",
+        "icon": "$(symbol-class)"
+      },
+      {
+        "command": "adoext.setPlanningStateFilter",
+        "title": "Configure Sections",
+        "category": "ADOExt",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "adoext.setPlanningTitleFilter",
+        "title": "Filter by Title",
+        "category": "ADOExt",
+        "icon": "$(search)"
+      },
+      {
+        "command": "adoext.setPlanningGlobalFilter",
+        "title": "Configure Global Filter",
+        "category": "ADOExt",
+        "icon": "$(filter)"
+      },
       {
         "command": "adoext.openWorkItem",
         "title": "Open Work Item in Browser",
@@ -1265,53 +1295,163 @@
               "typeFilter": [],
               "showUnmatchedStates": true
             },
-            "workItems": { "sections": [], "actions": ["adoext.refreshWorkItems", "adoext.selectWorkItemQuery", "adoext.openSavedQuery", "adoext.saveWorkItemQuery", "adoext.createWorkItem", "adoext.setWorkItemFilter", "adoext.setWorkItemSort", "adoext.toggleHideDoneWorkItems"] },
-            "backlog": { "sections": [], "actions": ["adoext.openBacklogView", "adoext.refreshBacklog", "adoext.setPlanningAssignedFilter", "adoext.setPlanningAreaFilter", "adoext.setPlanningTitleFilter"] },
-            "sprints": { "sections": [], "actions": ["adoext.openSprintView", "adoext.refreshSprints", "adoext.setPlanningAssignedFilter", "adoext.setPlanningIterationFilter", "adoext.setPlanningAreaFilter", "adoext.setPlanningTitleFilter"] },
-            "boards": { "sections": [], "actions": ["adoext.openBoardView", "adoext.refreshBoards", "adoext.setPlanningAssignedFilter", "adoext.setPlanningStateFilter", "adoext.setPlanningAreaFilter", "adoext.setPlanningTitleFilter"] }
+            "workItems": {
+              "sections": [],
+              "actions": [
+                "adoext.refreshWorkItems",
+                "adoext.selectWorkItemQuery",
+                "adoext.openSavedQuery",
+                "adoext.saveWorkItemQuery",
+                "adoext.createWorkItem",
+                "adoext.setWorkItemFilter",
+                "adoext.setWorkItemSort",
+                "adoext.toggleHideDoneWorkItems"
+              ]
+            },
+            "backlog": {
+              "sections": [],
+              "actions": [
+                "adoext.openBacklogView",
+                "adoext.refreshBacklog",
+                "adoext.setPlanningAssignedFilter",
+                "adoext.setPlanningAreaFilter",
+                "adoext.setPlanningTitleFilter"
+              ]
+            },
+            "sprints": {
+              "sections": [],
+              "actions": [
+                "adoext.openSprintView",
+                "adoext.refreshSprints",
+                "adoext.setPlanningAssignedFilter",
+                "adoext.setPlanningIterationFilter",
+                "adoext.setPlanningAreaFilter",
+                "adoext.setPlanningTitleFilter"
+              ]
+            },
+            "boards": {
+              "sections": [],
+              "actions": [
+                "adoext.openBoardView",
+                "adoext.refreshBoards",
+                "adoext.setPlanningAssignedFilter",
+                "adoext.setPlanningStateFilter",
+                "adoext.setPlanningAreaFilter",
+                "adoext.setPlanningTitleFilter"
+              ]
+            }
           },
           "properties": {
             "global": {
               "type": "object",
               "properties": {
-                "assignedFilter": { "type": "string", "enum": ["all", "mine"] },
-                "areaFilter": { "type": "string" },
-                "iterationFilter": { "type": "string" },
-                "titleFilter": { "type": "string" },
-                "typeFilter": { "type": "array", "items": { "type": "string" } },
-                "showUnmatchedStates": { "type": "boolean" }
+                "assignedFilter": {
+                  "type": "string",
+                  "enum": [
+                    "all",
+                    "mine"
+                  ]
+                },
+                "areaFilter": {
+                  "type": "string"
+                },
+                "iterationFilter": {
+                  "type": "string"
+                },
+                "titleFilter": {
+                  "type": "string"
+                },
+                "typeFilter": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "showUnmatchedStates": {
+                  "type": "boolean"
+                }
               }
             },
-            "workItems": { "$ref": "#/properties/adoext.planningViews/definitions/viewConfig" },
-            "backlog": { "$ref": "#/properties/adoext.planningViews/definitions/viewConfig" },
-            "sprints": { "$ref": "#/properties/adoext.planningViews/definitions/viewConfig" },
-            "boards": { "$ref": "#/properties/adoext.planningViews/definitions/viewConfig" }
+            "workItems": {
+              "$ref": "#/properties/adoext.planningViews/definitions/viewConfig"
+            },
+            "backlog": {
+              "$ref": "#/properties/adoext.planningViews/definitions/viewConfig"
+            },
+            "sprints": {
+              "$ref": "#/properties/adoext.planningViews/definitions/viewConfig"
+            },
+            "boards": {
+              "$ref": "#/properties/adoext.planningViews/definitions/viewConfig"
+            }
           },
           "definitions": {
             "viewConfig": {
               "type": "object",
               "properties": {
-                "assignedFilter": { "type": "string", "enum": ["all", "mine"] },
-                "areaFilter": { "type": "string" },
-                "iterationFilter": { "type": "string" },
-                "titleFilter": { "type": "string" },
-                "typeFilter": { "type": "array", "items": { "type": "string" } },
-                "showUnmatchedStates": { "type": "boolean" },
+                "assignedFilter": {
+                  "type": "string",
+                  "enum": [
+                    "all",
+                    "mine"
+                  ]
+                },
+                "areaFilter": {
+                  "type": "string"
+                },
+                "iterationFilter": {
+                  "type": "string"
+                },
+                "titleFilter": {
+                  "type": "string"
+                },
+                "typeFilter": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "showUnmatchedStates": {
+                  "type": "boolean"
+                },
                 "sections": {
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": ["id", "label", "stateFilter", "order"],
+                    "required": [
+                      "id",
+                      "label",
+                      "stateFilter",
+                      "order"
+                    ],
                     "properties": {
-                      "id": { "type": "string" },
-                      "label": { "type": "string" },
-                      "stateFilter": { "type": "array", "items": { "type": "string" } },
-                      "order": { "type": "number" },
-                      "collapsed": { "type": "boolean" }
+                      "id": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "stateFilter": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "order": {
+                        "type": "number"
+                      },
+                      "collapsed": {
+                        "type": "boolean"
+                      }
                     }
                   }
                 },
-                "actions": { "type": "array", "items": { "type": "string" } }
+                "actions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
               }
             }
           }
@@ -1362,6 +1502,8 @@
     "watch:host": "node ./scripts/build-extension-host.js --watch",
     "watch:webviews": "node ./scripts/build-webviews.js --watch",
     "lint": "eslint src --ext ts --max-warnings=0",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:compat": "node tests/bundle-compat/lowdb-cjs.mjs",
     "reindex": "scip-typescript index && scip-query reindex"
   },
@@ -1374,7 +1516,8 @@
     "esbuild": "0.28.2",
     "eslint": "8.57.1",
     "lit": "3.3.3",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "^4.1.11"
   },
   "dependencies": {
     "@azure/identity": "4.13.2",
