@@ -172,6 +172,12 @@
         "category": "ADOExt",
         "icon": "$(person)"
       },
+      { "command": "adoext.setPlanningAreaFilter", "title": "Filter by Area Path", "category": "ADOExt", "icon": "$(folder)" },
+      { "command": "adoext.setPlanningIterationFilter", "title": "Filter by Iteration", "category": "ADOExt", "icon": "$(milestone)" },
+      { "command": "adoext.setPlanningTypeFilter", "title": "Filter by Work Item Type", "category": "ADOExt", "icon": "$(symbol-class)" },
+      { "command": "adoext.setPlanningStateFilter", "title": "Configure Sections", "category": "ADOExt", "icon": "$(list-tree)" },
+      { "command": "adoext.setPlanningTitleFilter", "title": "Filter by Title", "category": "ADOExt", "icon": "$(search)" },
+      { "command": "adoext.setPlanningGlobalFilter", "title": "Configure Global Filter", "category": "ADOExt", "icon": "$(filter)" },
       {
         "command": "adoext.openWorkItem",
         "title": "Open Work Item in Browser",
@@ -483,94 +489,139 @@
         "title": "Show/Hide Resolved PR Threads",
         "category": "ADOExt",
         "icon": "$(eye-closed)"
+      },
+      {
+        "command": "adoext.refreshWorkItemTypeSchema",
+        "title": "Refresh Work Item Type Schema",
+        "category": "ADOExt"
       }
     ],
     "menus": {
       "view/title": [
         {
           "command": "adoext.refreshWorkItems",
-          "when": "view == adoext.workItems",
-          "group": "navigation"
+          "when": "view == adoext.workItems && adoext.workItems.show.refreshWorkItems",
+          "group": "navigation@1"
         },
         {
           "command": "adoext.selectWorkItemQuery",
-          "when": "view == adoext.workItems",
-          "group": "navigation"
+          "when": "view == adoext.workItems && adoext.workItems.show.selectWorkItemQuery",
+          "group": "navigation@2"
         },
         {
           "command": "adoext.openSavedQuery",
-          "when": "view == adoext.workItems",
-          "group": "navigation"
+          "when": "view == adoext.workItems && adoext.workItems.show.openSavedQuery",
+          "group": "navigation@3"
         },
         {
           "command": "adoext.saveWorkItemQuery",
-          "when": "view == adoext.workItems",
-          "group": "navigation"
+          "when": "view == adoext.workItems && adoext.workItems.show.saveWorkItemQuery",
+          "group": "navigation@4"
         },
         {
           "command": "adoext.createWorkItem",
-          "when": "view == adoext.workItems",
-          "group": "navigation"
+          "when": "view == adoext.workItems && adoext.workItems.show.createWorkItem",
+          "group": "navigation@5"
         },
         {
           "command": "adoext.setWorkItemFilter",
-          "when": "view == adoext.workItems",
-          "group": "navigation"
+          "when": "view == adoext.workItems && adoext.workItems.show.setWorkItemFilter",
+          "group": "navigation@6"
         },
         {
           "command": "adoext.setWorkItemSort",
-          "when": "view == adoext.workItems",
-          "group": "navigation"
+          "when": "view == adoext.workItems && adoext.workItems.show.setWorkItemSort",
+          "group": "navigation@7"
         },
         {
           "command": "adoext.toggleHideDoneWorkItems",
-          "when": "view == adoext.workItems",
-          "group": "navigation"
+          "when": "view == adoext.workItems && adoext.workItems.show.toggleHideDoneWorkItems",
+          "group": "navigation@8"
         },
         {
           "command": "adoext.openBacklogView",
-          "when": "view == adoext.backlog",
-          "group": "navigation"
+          "when": "view == adoext.backlog && adoext.backlog.show.openBacklogView",
+          "group": "navigation@1"
         },
         {
           "command": "adoext.refreshBacklog",
-          "when": "view == adoext.backlog",
-          "group": "navigation"
+          "when": "view == adoext.backlog && adoext.backlog.show.refreshBacklog",
+          "group": "navigation@2"
         },
         {
           "command": "adoext.setPlanningAssignedFilter",
-          "when": "view == adoext.backlog",
-          "group": "navigation"
+          "when": "view == adoext.backlog && adoext.backlog.show.setPlanningAssignedFilter",
+          "group": "navigation@3"
+        },
+        {
+          "command": "adoext.setPlanningAreaFilter",
+          "when": "view == adoext.backlog && adoext.backlog.show.setPlanningAreaFilter",
+          "group": "navigation@4"
+        },
+        {
+          "command": "adoext.setPlanningTitleFilter",
+          "when": "view == adoext.backlog && adoext.backlog.show.setPlanningTitleFilter",
+          "group": "navigation@5"
         },
         {
           "command": "adoext.openSprintView",
-          "when": "view == adoext.sprints",
-          "group": "navigation"
+          "when": "view == adoext.sprints && adoext.sprints.show.openSprintView",
+          "group": "navigation@1"
         },
         {
           "command": "adoext.refreshSprints",
-          "when": "view == adoext.sprints",
-          "group": "navigation"
+          "when": "view == adoext.sprints && adoext.sprints.show.refreshSprints",
+          "group": "navigation@2"
         },
         {
           "command": "adoext.setPlanningAssignedFilter",
-          "when": "view == adoext.sprints",
-          "group": "navigation"
+          "when": "view == adoext.sprints && adoext.sprints.show.setPlanningAssignedFilter",
+          "group": "navigation@3"
+        },
+        {
+          "command": "adoext.setPlanningIterationFilter",
+          "when": "view == adoext.sprints && adoext.sprints.show.setPlanningIterationFilter",
+          "group": "navigation@4"
+        },
+        {
+          "command": "adoext.setPlanningAreaFilter",
+          "when": "view == adoext.sprints && adoext.sprints.show.setPlanningAreaFilter",
+          "group": "navigation@5"
+        },
+        {
+          "command": "adoext.setPlanningTitleFilter",
+          "when": "view == adoext.sprints && adoext.sprints.show.setPlanningTitleFilter",
+          "group": "navigation@6"
         },
         {
           "command": "adoext.openBoardView",
-          "when": "view == adoext.boards",
-          "group": "navigation"
+          "when": "view == adoext.boards && adoext.boards.show.openBoardView",
+          "group": "navigation@1"
         },
         {
           "command": "adoext.refreshBoards",
-          "when": "view == adoext.boards",
-          "group": "navigation"
+          "when": "view == adoext.boards && adoext.boards.show.refreshBoards",
+          "group": "navigation@2"
         },
         {
           "command": "adoext.setPlanningAssignedFilter",
-          "when": "view == adoext.boards",
-          "group": "navigation"
+          "when": "view == adoext.boards && adoext.boards.show.setPlanningAssignedFilter",
+          "group": "navigation@3"
+        },
+        {
+          "command": "adoext.setPlanningStateFilter",
+          "when": "view == adoext.boards && adoext.boards.show.setPlanningStateFilter",
+          "group": "navigation@4"
+        },
+        {
+          "command": "adoext.setPlanningAreaFilter",
+          "when": "view == adoext.boards && adoext.boards.show.setPlanningAreaFilter",
+          "group": "navigation@5"
+        },
+        {
+          "command": "adoext.setPlanningTitleFilter",
+          "when": "view == adoext.boards && adoext.boards.show.setPlanningTitleFilter",
+          "group": "navigation@6"
         },
         {
           "command": "adoext.selectOrganization",
@@ -1104,6 +1155,167 @@
           "maximum": 100,
           "description": "Maximum number of pipeline runs fetched per project scope for the ADOExt Pipelines view."
         },
+        "adoext.workItemQueryLimit": {
+          "type": "number",
+          "default": 200,
+          "minimum": 1,
+          "maximum": 500,
+          "description": "Maximum work items fetched per scope for the Work Items view (WIQL query limit)."
+        },
+        "adoext.planningQueryLimit": {
+          "type": "number",
+          "default": 500,
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Maximum work items per WIQL query for Backlog, Sprint, and Board views."
+        },
+        "adoext.planningTotalLimit": {
+          "type": "number",
+          "default": 1000,
+          "minimum": 1,
+          "maximum": 5000,
+          "description": "Hard cap on total work items including recursively fetched parents for planning views."
+        },
+        "adoext.completionWorkItemLimit": {
+          "type": "number",
+          "default": 50,
+          "minimum": 10,
+          "maximum": 200,
+          "description": "Maximum work items loaded for inline #id completion suggestions."
+        },
+        "adoext.buildsPerQuery": {
+          "type": "number",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 50,
+          "description": "Maximum builds fetched per pull request or work item artifact link."
+        },
+        "adoext.pullRequestLimit": {
+          "type": "number",
+          "default": 100,
+          "minimum": 1,
+          "maximum": 500,
+          "description": "Maximum pull requests fetched per scope."
+        },
+        "adoext.workItemTypeSchemaCacheTtlMinutes": {
+          "type": "number",
+          "default": 240,
+          "minimum": 30,
+          "maximum": 1440,
+          "description": "TTL in minutes for the work item type schema cache (types, fields, states). Longer values reduce API calls."
+        },
+        "adoext.workItemIconCacheTtlMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 5,
+          "maximum": 1440,
+          "description": "TTL in minutes for cached work item type icon URLs."
+        },
+        "adoext.classificationNodeDepth": {
+          "type": "number",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 20,
+          "description": "Depth of area/iteration path tree fetched for filter QuickPicks."
+        },
+        "adoext.savedQueryFolderDepth": {
+          "type": "number",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Depth of saved query folder traversal."
+        },
+        "adoext.pipelineTimelineCacheSize": {
+          "type": "number",
+          "default": 200,
+          "minimum": 10,
+          "maximum": 1000,
+          "description": "Maximum entries in the in-memory pipeline timeline cache."
+        },
+        "adoext.scopeFetchConcurrency": {
+          "type": "number",
+          "default": 4,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Number of parallel organization/project scope fetches."
+        },
+        "adoext.workItemBatchSize": {
+          "type": "number",
+          "default": 200,
+          "minimum": 1,
+          "maximum": 200,
+          "description": "Items fetched per Azure DevOps batch API call (max 200 is the API constraint)."
+        },
+        "adoext.fuzzySearchThreshold": {
+          "type": "number",
+          "default": 0.4,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fuse.js threshold for fuzzy title search. 0 = exact match only, 1 = match anything."
+        },
+        "adoext.planningViews": {
+          "type": "object",
+          "markdownDescription": "Configuration for planning view filters, sections, and toolbar buttons. Use the guided commands (Filter by Area/Iteration/Title/Type) for easy editing, or edit directly. See [settings reference](docs/settings.example.jsonc).",
+          "default": {
+            "global": {
+              "assignedFilter": "all",
+              "areaFilter": "",
+              "iterationFilter": "",
+              "titleFilter": "",
+              "typeFilter": [],
+              "showUnmatchedStates": true
+            },
+            "workItems": { "sections": [], "actions": ["adoext.refreshWorkItems", "adoext.selectWorkItemQuery", "adoext.openSavedQuery", "adoext.saveWorkItemQuery", "adoext.createWorkItem", "adoext.setWorkItemFilter", "adoext.setWorkItemSort", "adoext.toggleHideDoneWorkItems"] },
+            "backlog": { "sections": [], "actions": ["adoext.openBacklogView", "adoext.refreshBacklog", "adoext.setPlanningAssignedFilter", "adoext.setPlanningAreaFilter", "adoext.setPlanningTitleFilter"] },
+            "sprints": { "sections": [], "actions": ["adoext.openSprintView", "adoext.refreshSprints", "adoext.setPlanningAssignedFilter", "adoext.setPlanningIterationFilter", "adoext.setPlanningAreaFilter", "adoext.setPlanningTitleFilter"] },
+            "boards": { "sections": [], "actions": ["adoext.openBoardView", "adoext.refreshBoards", "adoext.setPlanningAssignedFilter", "adoext.setPlanningStateFilter", "adoext.setPlanningAreaFilter", "adoext.setPlanningTitleFilter"] }
+          },
+          "properties": {
+            "global": {
+              "type": "object",
+              "properties": {
+                "assignedFilter": { "type": "string", "enum": ["all", "mine"] },
+                "areaFilter": { "type": "string" },
+                "iterationFilter": { "type": "string" },
+                "titleFilter": { "type": "string" },
+                "typeFilter": { "type": "array", "items": { "type": "string" } },
+                "showUnmatchedStates": { "type": "boolean" }
+              }
+            },
+            "workItems": { "$ref": "#/properties/adoext.planningViews/definitions/viewConfig" },
+            "backlog": { "$ref": "#/properties/adoext.planningViews/definitions/viewConfig" },
+            "sprints": { "$ref": "#/properties/adoext.planningViews/definitions/viewConfig" },
+            "boards": { "$ref": "#/properties/adoext.planningViews/definitions/viewConfig" }
+          },
+          "definitions": {
+            "viewConfig": {
+              "type": "object",
+              "properties": {
+                "assignedFilter": { "type": "string", "enum": ["all", "mine"] },
+                "areaFilter": { "type": "string" },
+                "iterationFilter": { "type": "string" },
+                "titleFilter": { "type": "string" },
+                "typeFilter": { "type": "array", "items": { "type": "string" } },
+                "showUnmatchedStates": { "type": "boolean" },
+                "sections": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "label", "stateFilter", "order"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "label": { "type": "string" },
+                      "stateFilter": { "type": "array", "items": { "type": "string" } },
+                      "order": { "type": "number" },
+                      "collapsed": { "type": "boolean" }
+                    }
+                  }
+                },
+                "actions": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        },
         "adoext.showResolvedPullRequestThreads": {
           "type": "boolean",
           "default": true,
@@ -1167,6 +1379,7 @@
     "@azure/identity": "4.13.2",
     "@azure/msal-node": "5.5.0",
     "azure-devops-node-api": "15.1.3",
+    "fuse.js": "^7.0.0",
     "lowdb": "^7.0.1",
     "open": "11.0.1"
   }

@@ -1,8 +1,11 @@
 import * as vscode from 'vscode';
 import type { WorkItem } from '../api/adoClient';
 import type { AdoClient } from '../api/adoClient';
+import type { PlanningWorkItemOptions } from '../api/adoClient';
 import type { ConfigManager } from '../config/configManager';
-import { WorkItemNode, stateIcon } from './workItemProvider';
+import { WorkItemNode, stateIcon, WorkItemSectionGroup } from './workItemProvider';
+import { resolveSections, resolveFilter, type PlanningViewSection, type PlanningViewKey } from '../config/planningConfig';
+import { filterWorkItemsByTitle } from '../utils/planningFilter';
 import {
     scopeKey,
     scopeLabel,
@@ -22,6 +25,7 @@ type PlanningTreeNode =
     | PlanningScopeGroup
     | SprintGroup
     | BoardColumnGroup
+    | WorkItemSectionGroup
     | WorkItemNode
     | vscode.TreeItem;
 
@@ -114,7 +118,7 @@ export class BacklogProvider implements vscode.TreeDataProvider<PlanningTreeNode
                 return [setupNode];
             }
 
-            const { scopes, items } = await loadPlanningItems(this.client, this.config);
+            const { scopes, items } = await loadPlanningItems(this.client, this.config, 'backlog');
             if (scopes.length === 0) {
                 return [createConfigureNode()];
             }
@@ -231,7 +235,7 @@ export class SprintProvider implements vscode.TreeDataProvider<PlanningTreeNode>
                 return [setupNode];
             }
 
-            const { scopes, items } = await loadPlanningItems(this.client, this.config);
+            const { scopes, items } = await loadPlanningItems(this.client, this.config, 'sprints');
             if (scopes.length === 0) {
                 return [createConfigureNode()];
             }
@@ -293,7 +297,7 @@ export class BoardProvider implements vscode.TreeDataProvider<PlanningTreeNode> 
             return this.boardColumnNodes(element.items);
         }
 
-        if (element instanceof BoardColumnGroup) {
+        if (element instanceof BoardColumnGroup || element instanceof WorkItemSectionGroup) {
             return this.itemNodes(element.items);
         }
 
@@ -308,7 +312,7 @@ export class BoardProvider implements vscode.TreeDataProvider<PlanningTreeNode> 
                 return [setupNode];
             }
 
-            const { scopes, items } = await loadPlanningItems(this.client, this.config);
+            const { scopes, items } = await loadPlanningItems(this.client, this.config, 'boards');
             if (scopes.length === 0) {
                 return [createConfigureNode()];
             }
@@ -320,7 +324,7 @@ export class BoardProvider implements vscode.TreeDataProvider<PlanningTreeNode> 
             }
 
             if (scopes.length === 1) {
-                return this.boardColumnNodes(items);
+                return boardSections(items, this.config);
             }
 
             return groupByScope(items, 'boardScopeGroup');
@@ -345,15 +349,25 @@ export class BoardProvider implements vscode.TreeDataProvider<PlanningTreeNode> 
 
 async function loadPlanningItems(
     client: AdoClient,
-    config: ConfigManager
+    config: ConfigManager,
+    view: PlanningViewKey
 ): Promise<{ scopes: ProjectScope[]; items: ScopedWorkItem[] }> {
-    const assignedToMe = config.planningAssignedFilter === 'mine';
+    const filter = resolveFilter(config.planningViews, view);
+    const assignedToMe = filter.assignedFilter === 'mine';
+    const options: PlanningWorkItemOptions = {};
+    if (filter.areaFilter) options.areaFilter = filter.areaFilter;
+    if (filter.iterationFilter) options.iterationFilter = filter.iterationFilter;
+    if (filter.typeFilter.length > 0) options.typeFilter = filter.typeFilter;
+
     const { scopes, items: rawItems } = await forEachScope(client, config, async scope => {
-        const workItems = await client.getPlanningWorkItems(scope.project, scope.organization, assignedToMe);
+        const workItems = await client.getPlanningWorkItems(scope.project, scope.organization, assignedToMe, options);
         return workItems.map(workItem => ({ workItem, scope }));
     });
     let items = rawItems;
 
+    if (filter.titleFilter) {
+        items = filterWorkItemsByTitle(items, filter.titleFilter, config.fuzzySearchThreshold);
+    }
 
     const hideStates = new Set(config.workItemHideStates.map(s => s.toLowerCase()));
     if (hideStates.size > 0) {
@@ -411,6 +425,39 @@ function boardColumns(items: ScopedWorkItem[]): BoardColumnGroup[] {
     return [...byState.entries()]
         .map(([state, stateItems]) => new BoardColumnGroup(state, stateItems.sort(compareWorkItems)))
         .sort((left, right) => stateSortValue(left.state) - stateSortValue(right.state));
+}
+
+function boardSections(items: ScopedWorkItem[], config: ConfigManager): (WorkItemSectionGroup | BoardColumnGroup)[] {
+    const sections = resolveSections(config.planningViews, 'boards');
+    if (sections.length === 0) {
+        return boardColumns(items);
+    }
+
+    const groups: WorkItemSectionGroup[] = [];
+    const claimed = new Set<ScopedWorkItem>();
+
+    for (const section of sections) {
+        const stateSet = new Set(section.stateFilter.map(s => s.toLowerCase()));
+        const sectionItems = items.filter(item => {
+            const state = (item.workItem.fields?.['System.State'] as string | undefined) ?? '';
+            return stateSet.has(state.toLowerCase());
+        });
+        sectionItems.forEach(item => claimed.add(item));
+        if (sectionItems.length > 0) {
+            groups.push(new WorkItemSectionGroup(section, sectionItems.length, sectionItems.sort(compareWorkItems)));
+        }
+    }
+
+    const filter = resolveFilter(config.planningViews, 'boards');
+    if (filter.showUnmatchedStates) {
+        const unmatched = items.filter(item => !claimed.has(item));
+        if (unmatched.length > 0) {
+            const otherSection: PlanningViewSection = { id: '_other', label: 'Other', stateFilter: [], order: 9999 };
+            groups.push(new WorkItemSectionGroup(otherSection, unmatched.length, unmatched.sort(compareWorkItems)));
+        }
+    }
+
+    return groups;
 }
 
 function compareWorkItems(left: ScopedWorkItem, right: ScopedWorkItem): number {

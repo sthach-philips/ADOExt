@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import type { PipelineRunsFilter } from '../api/adoClient';
+import { parsePlanningConfig, resolveFilter, DEFAULT_PLANNING_CONFIG } from './planningConfig';
+import type { PlanningConfig, PlanningFilterFields, PlanningViewKey, PlanningViewSection } from './planningConfig';
 
 export const ALL_PROJECTS = '*';
 
@@ -409,6 +411,106 @@ export class ConfigManager {
         const raw = this.config.get<number>('pipelineRunsTop', 25);
         const top = Math.floor(raw);
         return Math.max(1, Math.min(100, top));
+    }
+
+    get workItemQueryLimit(): number {
+        const raw = this.config.get<number>('workItemQueryLimit', 200);
+        return Math.max(1, Math.min(500, Math.floor(raw)));
+    }
+
+    get planningQueryLimit(): number {
+        const raw = this.config.get<number>('planningQueryLimit', 500);
+        return Math.max(1, Math.min(1000, Math.floor(raw)));
+    }
+
+    get planningTotalLimit(): number {
+        const raw = this.config.get<number>('planningTotalLimit', 1000);
+        return Math.max(1, Math.min(5000, Math.floor(raw)));
+    }
+
+    get completionWorkItemLimit(): number {
+        const raw = this.config.get<number>('completionWorkItemLimit', 50);
+        return Math.max(10, Math.min(200, Math.floor(raw)));
+    }
+
+    get buildsPerQuery(): number {
+        const raw = this.config.get<number>('buildsPerQuery', 10);
+        return Math.max(1, Math.min(50, Math.floor(raw)));
+    }
+
+    get pullRequestLimit(): number {
+        const raw = this.config.get<number>('pullRequestLimit', 100);
+        return Math.max(1, Math.min(500, Math.floor(raw)));
+    }
+
+    get workItemTypeSchemaCacheTtlMs(): number {
+        const minutes = this.config.get<number>('workItemTypeSchemaCacheTtlMinutes', 240);
+        return Math.max(30, Math.min(1440, Math.floor(minutes))) * 60_000;
+    }
+
+    get workItemIconCacheTtlMs(): number {
+        const minutes = this.config.get<number>('workItemIconCacheTtlMinutes', 60);
+        return Math.max(5, Math.min(1440, Math.floor(minutes))) * 60_000;
+    }
+
+    get classificationNodeDepth(): number {
+        const raw = this.config.get<number>('classificationNodeDepth', 10);
+        return Math.max(1, Math.min(20, Math.floor(raw)));
+    }
+
+    get savedQueryFolderDepth(): number {
+        const raw = this.config.get<number>('savedQueryFolderDepth', 2);
+        return Math.max(1, Math.min(5, Math.floor(raw)));
+    }
+
+    get pipelineTimelineCacheSize(): number {
+        const raw = this.config.get<number>('pipelineTimelineCacheSize', 200);
+        return Math.max(10, Math.min(1000, Math.floor(raw)));
+    }
+
+    get scopeFetchConcurrency(): number {
+        const raw = this.config.get<number>('scopeFetchConcurrency', 4);
+        return Math.max(1, Math.min(10, Math.floor(raw)));
+    }
+
+    get workItemBatchSize(): number {
+        const raw = this.config.get<number>('workItemBatchSize', 200);
+        return Math.max(1, Math.min(200, Math.floor(raw)));
+    }
+
+    get planningViews(): PlanningConfig {
+        const raw = this.config.get<unknown>('planningViews', undefined);
+        return parsePlanningConfig(raw ?? DEFAULT_PLANNING_CONFIG);
+    }
+
+    get fuzzySearchThreshold(): number {
+        const raw = this.config.get<number>('fuzzySearchThreshold', 0.4);
+        return Math.max(0, Math.min(1, raw));
+    }
+
+    resolvedFilter(view: PlanningViewKey): PlanningFilterFields {
+        return resolveFilter(this.planningViews, view);
+    }
+
+    async setPlanningViewFilter(view: PlanningViewKey, patch: Partial<PlanningFilterFields>): Promise<void> {
+        const current = this.planningViews;
+        const updated = { ...current[view], ...patch };
+        const newConfig = { ...current, [view]: updated };
+        await this.config.update('planningViews', newConfig, vscode.ConfigurationTarget.Global);
+    }
+
+    async setPlanningGlobalFilter(patch: Partial<PlanningFilterFields>): Promise<void> {
+        const current = this.planningViews;
+        const updated = { ...current.global, ...patch };
+        const newConfig = { ...current, global: updated };
+        await this.config.update('planningViews', newConfig, vscode.ConfigurationTarget.Global);
+    }
+
+    async setPlanningViewSections(view: PlanningViewKey, sections: PlanningViewSection[]): Promise<void> {
+        const current = this.planningViews;
+        const updated = { ...current[view], sections };
+        const newConfig = { ...current, [view]: updated };
+        await this.config.update('planningViews', newConfig, vscode.ConfigurationTarget.Global);
     }
 
     /** Returns true if both organization and project are configured. */

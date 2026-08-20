@@ -29,7 +29,7 @@ async function main() {
     if (db.data.entries['k1'].value !== 'hello') {
         throw new Error('roundtrip failed');
     }
-    console.log('OK: lowdb roundtrip in CJS bundle works');
+    console.log('PASS: lowdb ESM imports resolved in bundled CJS context');
 }
 main();
 `);

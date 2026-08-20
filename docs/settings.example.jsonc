@@ -1,0 +1,101 @@
+// ADOExt -- full settings reference
+// Copy any of these into your VS Code settings.json.
+// All values shown are defaults unless noted otherwise.
+{
+  // -- Authentication --
+  "adoext.authMethod": "vscode",
+
+  // -- Organization / project scope --
+  "adoext.organizations": ["mycompany"],
+  "adoext.projectsByOrganization": {
+    "mycompany": ["MyProject"]
+  },
+
+  // -- Planning views --
+  // Best edited via the guided commands:
+  //   ADOExt: Filter by Area / Iteration / Title / Type / Configure Sections
+  // Direct editing is fully supported with schema validation.
+  "adoext.planningViews": {
+    "global": {
+      "assignedFilter": "all",
+      "areaFilter": "",
+      "iterationFilter": "",
+      "titleFilter": "",
+      "typeFilter": [],
+      "showUnmatchedStates": true
+    },
+    "workItems": {
+      "sections": [
+        { "id": "new", "label": "New", "stateFilter": ["New", "Proposed"], "order": 1 },
+        { "id": "active", "label": "Active", "stateFilter": ["Active", "In Progress", "Committed"], "order": 2 },
+        { "id": "review", "label": "Review", "stateFilter": ["Ready", "Ready for Review"], "order": 3, "collapsed": true }
+      ],
+      "actions": [
+        "adoext.refreshWorkItems",
+        "adoext.selectWorkItemQuery",
+        "adoext.openSavedQuery",
+        "adoext.saveWorkItemQuery",
+        "adoext.createWorkItem",
+        "adoext.setWorkItemFilter",
+        "adoext.setWorkItemSort",
+        "adoext.toggleHideDoneWorkItems"
+      ]
+    },
+    "backlog": {
+      "sections": [],
+      "actions": [
+        "adoext.openBacklogView",
+        "adoext.refreshBacklog",
+        "adoext.setPlanningAssignedFilter",
+        "adoext.setPlanningAreaFilter",
+        "adoext.setPlanningTitleFilter"
+      ]
+    },
+    "sprints": {
+      "sections": [],
+      "actions": [
+        "adoext.openSprintView",
+        "adoext.refreshSprints",
+        "adoext.setPlanningAssignedFilter",
+        "adoext.setPlanningIterationFilter",
+        "adoext.setPlanningAreaFilter",
+        "adoext.setPlanningTitleFilter"
+      ]
+    },
+    "boards": {
+      "sections": [],
+      "actions": [
+        "adoext.openBoardView",
+        "adoext.refreshBoards",
+        "adoext.setPlanningAssignedFilter",
+        "adoext.setPlanningStateFilter",
+        "adoext.setPlanningAreaFilter",
+        "adoext.setPlanningTitleFilter"
+      ]
+    }
+  },
+
+  // -- Fuzzy search --
+  "adoext.fuzzySearchThreshold": 0.4,
+
+  // -- API limits --
+  "adoext.workItemQueryLimit": 200,
+  "adoext.planningQueryLimit": 500,
+  "adoext.planningTotalLimit": 1000,
+  "adoext.workItemBatchSize": 200,
+  "adoext.pullRequestLimit": 100,
+  "adoext.pipelineRunsTop": 25,
+  "adoext.buildsPerQuery": 10,
+  "adoext.completionWorkItemLimit": 50,
+  "adoext.scopeFetchConcurrency": 4,
+  "adoext.classificationNodeDepth": 10,
+  "adoext.savedQueryFolderDepth": 2,
+  "adoext.pipelineTimelineCacheSize": 200,
+
+  // -- Cache TTLs --
+  "adoext.workItemTypeSchemaCacheTtlMinutes": 240,
+  "adoext.workItemIconCacheTtlMinutes": 60,
+
+  // -- Notifications --
+  "adoext.pullRequestCommentPollIntervalSeconds": 300
+}
