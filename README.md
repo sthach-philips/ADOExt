@@ -178,13 +178,65 @@ code --install-extension ./adoext-<version>.vsix
 
 Open VS Code Settings (Ctrl+, / Cmd+,) and search for `adoext` to customize:
 
+### Authentication
+
 | Setting | Description | Default |
 |---------|-------------|---------|
-| `adoext.notifyOnNewPullRequestComments` | Show toast when PRs get new comments | `true` |
-| `adoext.pullRequestCommentPollIntervalSeconds` | How often to check for new PR comments | `60` |
-| `adoext.workItemQueries` | Custom saved work item query filters | (defaults) |
-| `adoext.pullRequestQueries` | Custom saved PR query filters | (defaults) |
-| `adoext.projectsByOrganization` | Multi-org project selection | `{}` |
+| `adoext.authMethod` | Auth method: `vscode`, `msal`, `azcli`, or `pat` | `"vscode"` |
+
+### Organization & Projects
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `adoext.projectsByOrganization` | Multi-org project selection map | `{}` |
+
+### Work Items
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `adoext.workItemQueries` | Saved work item query definitions | (defaults) |
+| `adoext.workItemFilterRegex` | Regex filter for work item titles | `""` |
+| `adoext.workItemSortOrder` | Sort by `name` or `date` | `"name"` |
+| `adoext.workItemHideStates` | States to hide (e.g. `["Done", "Removed"]`) | `[]` |
+| `adoext.workItemQueryLimit` | Max items fetched per scope | `200` |
+
+### Pull Requests
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `adoext.pullRequestQueries` | Saved PR bucket definitions | (defaults) |
+| `adoext.pullRequestFilterRegex` | Regex filter for PR titles | `""` |
+| `adoext.pullRequestSortOrder` | Sort by `title` or `date` | `"title"` |
+| `adoext.pullRequestLimit` | Max PRs fetched per scope | `100` |
+| `adoext.showResolvedPullRequestThreads` | Show resolved comment threads | `true` |
+| `adoext.hideSystemPullRequestThreads` | Hide system-generated threads | `true` |
+
+### Planning (Backlog, Sprints, Boards)
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `adoext.planningViews` | Configurable filters, sections, and toolbar per view | (defaults) |
+| `adoext.planningAssignedFilter` | Show `all` items or only `mine` | `"all"` |
+| `adoext.planningQueryLimit` | Max items per WIQL query | `500` |
+| `adoext.planningTotalLimit` | Hard cap including recursive parents | `1000` |
+| `adoext.fuzzySearchThreshold` | Fuse.js threshold for title search (0=exact, 1=any) | `0.4` |
+
+### Pipelines
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `adoext.pipelineRunsFilter` | Filter: `all`, `running`, `failed`, or `mine` | `"all"` |
+| `adoext.pipelineRunsGroupBy` | Group by `none`, `repository`, or `branch` | `"none"` |
+| `adoext.pipelineRunsTop` | Max runs fetched per scope | `25` |
+
+### Notifications
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `adoext.notifyOnNewPullRequestComments` | Toast on new PR comments | `true` |
+| `adoext.notifyOnPullRequestReviewRequests` | Toast when added as reviewer | `true` |
+| `adoext.notifyOnPullRequestStatusChanges` | Toast on reviewer votes | `true` |
+| `adoext.pullRequestCommentPollIntervalSeconds` | Poll interval for notifications | `300` |
 
 ---
 
@@ -198,18 +250,86 @@ Use `ADOExt: Copy MCP Server Configuration` to generate a ready-to-paste `.vscod
 
 ## 🎯 Commands
 
-| Command | Shortcut | Purpose |
-|---------|----------|---------|
-| `ADOExt: Sign In` | — | Authenticate with Microsoft |
-| `ADOExt: Select Organization` | — | Choose organization(s) |
-| `ADOExt: Select Project` | — | Choose project(s) |
-| `ADOExt: Create Work Item` | — | Create a new work item interactively |
-| `ADOExt: Create Work Item from Selection` | — | Create work item from highlighted text |
-| `ADOExt: Create Work Item from TODO` | — | Scan active file for TODO comments |
-| `ADOExt: Open Saved Query` | — | Browse and open saved work item queries |
-| `ADOExt: Refresh Work Items` | — | Manually refresh work items tree |
-| `ADOExt: Refresh Pull Requests` | — | Manually refresh PR tree |
-| `ADOExt: Checkout Pull Request Branch` | — | Check out a PR branch locally |
+All commands are available via the Command Palette (Ctrl+Shift+P / Cmd+Shift+P) under the "ADOExt" category.
+
+### Account & Setup
+
+| Command | Purpose |
+|---------|---------|
+| `Sign In to Azure DevOps` | Authenticate with Microsoft |
+| `Sign Out from Azure DevOps` | Sign out and clear session |
+| `Select Organization` | Choose organization(s) |
+| `Select Project` | Choose project(s) |
+| `Detect Repository Context from Workspace` | Auto-detect org/project from git remote |
+
+### Work Items
+
+| Command | Purpose |
+|---------|---------|
+| `Create Work Item` | Create a new work item interactively |
+| `Create Work Item from Selection` | Create work item from highlighted text |
+| `Create Work Item from TODO Comment` | Create work item from a TODO in code |
+| `Open Saved Query` | Browse and open saved WIQL queries |
+| `View Work Item Details` | Open work item in details panel |
+| `Change Work Item State` | Transition work item to a different state |
+| `Start Working` | Create a branch for a work item |
+| `Filter Work Items` | Set regex title filter |
+| `Sort Work Items` | Toggle sort by name or date |
+| `Toggle Hide Done Work Items` | Show/hide completed items |
+| `Refresh Work Items` | Manually refresh tree |
+
+### Pull Requests
+
+| Command | Purpose |
+|---------|---------|
+| `View Pull Request Details` | Open PR in details panel |
+| `View Pull Request Diff` | Open native multi-diff editor |
+| `Checkout Pull Request Branch` | Check out PR branch locally |
+| `Approve Pull Request` | Vote approve |
+| `Approve Pull Request with Suggestions` | Vote approve with suggestions |
+| `Wait for Pull Request Author` | Vote wait for author |
+| `Reject Pull Request` | Vote reject |
+| `Reset Pull Request Vote` | Clear your vote |
+| `Add Comment to Pull Request` | Add a top-level PR comment |
+| `Show/Hide Resolved PR Threads` | Toggle resolved thread visibility |
+| `Filter Pull Requests` | Set regex title filter |
+| `Sort Pull Requests` | Toggle sort by title or date |
+| `Refresh Pull Requests` | Manually refresh tree |
+
+### Planning (Backlog, Sprints, Boards)
+
+| Command | Purpose |
+|---------|---------|
+| `Open Backlog in Editor` | Wide editor view for backlog |
+| `Open Sprint in Editor` | Wide editor view for sprint |
+| `Open Board in Editor` | Wide editor view for board |
+| `Filter Planning Items by Assignee` | Toggle all / assigned to me |
+| `Filter by Area Path` | Set area path filter |
+| `Filter by Iteration` | Set iteration filter |
+| `Filter by Work Item Type` | Set type filter |
+| `Filter by Title` | Set fuzzy title filter |
+| `Configure Sections` | Group board columns by state |
+| `Configure Global Filter` | Edit the shared planning filter |
+
+### Pipelines
+
+| Command | Purpose |
+|---------|---------|
+| `View Pipeline Run Details` | Open run in details panel |
+| `Filter Pipeline Runs` | Filter by all/running/failed/mine |
+| `Group Pipeline Runs` | Group by none/repository/branch |
+| `Re-run Pipeline` | Trigger a new run of the same pipeline |
+| `Cancel Pipeline Run` | Cancel a running/queued pipeline |
+| `Open Step Log` | View step log output in editor |
+| `Refresh Pipelines` | Manually refresh tree |
+
+### MCP & Utilities
+
+| Command | Purpose |
+|---------|---------|
+| `Copy MCP Server Configuration` | Generate `.vscode/mcp.json` entry |
+| `Show MCP Server Info` | Display MCP server status |
+| `Show Output` | Open the ADOExt output channel |
 
 ---
 
