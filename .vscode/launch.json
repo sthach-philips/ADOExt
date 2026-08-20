@@ -12,7 +12,7 @@
         "ADO_MOCK_URL": "http://localhost:3000"
       },
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
+        "${workspaceFolder}/bin/**/*.js"
       ],
       "preLaunchTask": "preLaunch: mock (compile + server)"
     },
@@ -24,9 +24,9 @@
         "--extensionDevelopmentPath=${workspaceFolder}"
       ],
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
+        "${workspaceFolder}/bin/**/*.js"
       ],
-      "preLaunchTask": "npm: install and compile"
+      "preLaunchTask": "pnpm: install and compile"
     },
     {
       "name": "Run ADOExt",
@@ -36,9 +36,9 @@
         "--extensionDevelopmentPath=${workspaceFolder}"
       ],
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
+        "${workspaceFolder}/bin/**/*.js"
       ],
-      "preLaunchTask": "npm: compile"
+      "preLaunchTask": "pnpm: compile"
     },
     {
       "name": "Run ADOExt (Watch)",
@@ -48,9 +48,9 @@
         "--extensionDevelopmentPath=${workspaceFolder}"
       ],
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
+        "${workspaceFolder}/bin/**/*.js"
       ],
-      "preLaunchTask": "npm: watch"
+      "preLaunchTask": "pnpm: watch"
     }
   ]
 }

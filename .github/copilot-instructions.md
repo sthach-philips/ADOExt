@@ -33,9 +33,9 @@ rtk proxy <cmd>       # Run raw (no filtering) but track usage
 ## Quick Reference
 
 ```bash
-rtk npm run compile       # full build (type check + esbuild)
-rtk npm run lint          # ESLint (max-warnings=0)
-rtk npm run watch         # incremental rebuild
+rtk pnpm run compile      # full build (type check + esbuild)
+rtk pnpm run lint         # ESLint (max-warnings=0)
+rtk pnpm run watch        # incremental rebuild
 ```
 
 ## Architecture in One Line

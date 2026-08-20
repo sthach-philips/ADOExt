@@ -13,6 +13,9 @@ AGENTS.md
 package-lock.json
 node_modules/**
 mock-server/**
+bin/**
+!bin/extension.js
 out/**
-!out/extension.js
+.plans/**
+tests/**
 

@@ -13,8 +13,9 @@ import { ResultDetails, TestOutcome } from 'azure-devops-node-api/interfaces/Tes
 import { Operation } from 'azure-devops-node-api/interfaces/common/VSSInterfaces';
 import { ADO_BASE_URL } from '../utils/adoUrls';
 import { normalizeWorkItemTypeName, workItemTypeScopeKey } from '../utils/workItemTypeIcons';
-import { TtlCache } from '../utils/ttlCache';
 import { formatAdoError } from '../utils/adoErrors';
+import { SharedCache } from '../utils/sharedCache';
+import { ConfigManager } from '../config/configManager';
 import type {
     WorkItem,
     WorkItemType,
@@ -136,13 +137,33 @@ export const PullRequestReviewVotes = {
     approved: 10
 } as const satisfies Record<string, PullRequestReviewVote>;
 
-const WORK_ITEM_QUERY_LIMIT = 200;
-const PLANNING_WORK_ITEM_QUERY_LIMIT = 500;
-const BUILDS_PER_QUERY = 10;
-const PLANNING_WORK_ITEM_TOTAL_LIMIT = 1000;
-const WORK_ITEM_BATCH_SIZE = 200;
-const COMPLETION_WORK_ITEM_LIMIT = 50;
-const WORK_ITEM_TYPE_ICON_CACHE_TTL_MS = 60 * 60 * 1000;
+export interface WorkItemFieldSchema {
+    name: string;
+    referenceName: string;
+    allowedValues: string[];
+    isIdentity: boolean;
+}
+
+export interface WorkItemStateSchema {
+    name: string;
+    category: string;
+    color: string;
+}
+
+export interface WorkItemTypeSchema {
+    name: string;
+    referenceName: string;
+    color: string;
+    iconUrl: string;
+    fields: WorkItemFieldSchema[];
+    states: WorkItemStateSchema[];
+}
+
+export interface PlanningWorkItemOptions {
+    areaFilter?: string;
+    iterationFilter?: string;
+    typeFilter?: string[];
+}
 
 /**
  * Thin wrapper around the azure-devops-node-api package.
@@ -154,11 +175,22 @@ export class AdoClient {
     private _connectionsByOrganization = new Map<string, azdev.WebApi>();
     private _organization: string | undefined;
     private _currentUserIds = new Map<string, string>();
-    private _workItemStatesByType = new Map<string, string[]>();
-    private _workItemTypeIconsByScope = new Map<string, { expiresAt: number; icons: Map<string, string> }>();
-    private _workItemTypesCache = new TtlCache<WorkItemType[]>(300_000);
+    private _typeSchemaCache: SharedCache<WorkItemTypeSchema[]> | undefined;
+    private _iconCache: SharedCache<Map<string, string>> | undefined;
 
-    constructor(private _accessToken: string) {}
+    constructor(
+        private _accessToken: string,
+        private readonly _config: ConfigManager,
+        private readonly _storageDir?: string
+    ) {}
+
+    async initCaches(): Promise<void> {
+        if (!this._storageDir) { return; }
+        this._typeSchemaCache = new SharedCache(this._storageDir, 'workItemTypeSchemas', this._config.workItemTypeSchemaCacheTtlMs);
+        this._iconCache = new SharedCache(this._storageDir, 'workItemTypeIcons', this._config.workItemIconCacheTtlMs);
+        await this._typeSchemaCache.init();
+        await this._iconCache.init();
+    }
 
     /**
      * Update the access token and reconnect if an organization is already set.
@@ -167,9 +199,8 @@ export class AdoClient {
         this._accessToken = token;
         this._currentUserIds.clear();
         this._connectionsByOrganization.clear();
-        this._workItemStatesByType.clear();
-        this._workItemTypeIconsByScope.clear();
-        this._workItemTypesCache.clear();
+        void this._typeSchemaCache?.clear();
+        void this._iconCache?.clear();
 
         if (!token.trim()) {
             this.disconnect();
@@ -202,9 +233,8 @@ export class AdoClient {
         this._connection = undefined;
         this._connectionsByOrganization.clear();
         this._currentUserIds.clear();
-        this._workItemStatesByType.clear();
-        this._workItemTypeIconsByScope.clear();
-        this._workItemTypesCache.clear();
+        void this._typeSchemaCache?.clear();
+        void this._iconCache?.clear();
     }
 
     private get connection(): azdev.WebApi {
@@ -307,7 +337,7 @@ export class AdoClient {
 
     /**
      * Fetch the most recently changed active work items for use in completion
-     * suggestions. Limited to {@link COMPLETION_WORK_ITEM_LIMIT} items to keep
+     * suggestions. Limited to the configured completionWorkItemLimit to keep
      * the initial load fast; results should be cached by the caller.
      */
     async getRecentWorkItems(project: string, organization?: string): Promise<WorkItem[]> {
@@ -321,7 +351,7 @@ export class AdoClient {
                     ORDER BY [System.ChangedDate] DESC`
         };
 
-        const result = await witApi.queryByWiql(wiql, { project }, false, COMPLETION_WORK_ITEM_LIMIT);
+        const result = await witApi.queryByWiql(wiql, { project }, false, this._config.completionWorkItemLimit);
         if (!result.workItems || result.workItems.length === 0) {
             return [];
         }
@@ -385,13 +415,13 @@ export class AdoClient {
                     ORDER BY [System.ChangedDate] DESC`
         };
 
-        const result = await witApi.queryByWiql(wiql, { project }, false, WORK_ITEM_QUERY_LIMIT);
+        const result = await witApi.queryByWiql(wiql, { project }, false, this._config.workItemQueryLimit);
         if (!result.workItems || result.workItems.length === 0) {
             return [];
         }
 
         const ids = result.workItems
-            .slice(0, WORK_ITEM_QUERY_LIMIT)
+            .slice(0, this._config.workItemQueryLimit)
             .flatMap((wi: WorkItemReference) => wi.id !== undefined ? [wi.id] : []);
 
         if (ids.length === 0) {
@@ -416,7 +446,8 @@ export class AdoClient {
     async getPlanningWorkItems(
         project: string,
         organization?: string,
-        assignedToMe = false
+        assignedToMe = false,
+        options?: PlanningWorkItemOptions
     ): Promise<WorkItem[]> {
         const witApi: IWorkItemTrackingApi = await this.getConnectionFor(organization).getWorkItemTrackingApi();
         const whereClauses = [
@@ -426,6 +457,16 @@ export class AdoClient {
         if (assignedToMe) {
             whereClauses.push('[System.AssignedTo] = @me');
         }
+        if (options?.areaFilter) {
+            whereClauses.push(`[System.AreaPath] UNDER '${this.escapeWiqlString(options.areaFilter)}'`);
+        }
+        if (options?.iterationFilter) {
+            whereClauses.push(`[System.IterationPath] UNDER '${this.escapeWiqlString(options.iterationFilter)}'`);
+        }
+        if (options?.typeFilter && options.typeFilter.length > 0) {
+            const typeList = options.typeFilter.map(t => `'${this.escapeWiqlString(t)}'`).join(', ');
+            whereClauses.push(`[System.WorkItemType] IN (${typeList})`);
+        }
         const wiql = {
             query: `SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType],
                            [System.AssignedTo], [System.IterationPath], [System.AreaPath], [System.Tags]
@@ -434,13 +475,13 @@ export class AdoClient {
                      ORDER BY [System.ChangedDate] DESC`
         };
 
-        const result = await witApi.queryByWiql(wiql, { project }, false, PLANNING_WORK_ITEM_QUERY_LIMIT);
+        const result = await witApi.queryByWiql(wiql, { project }, false, this._config.planningQueryLimit);
         if (!result.workItems || result.workItems.length === 0) {
             return [];
         }
 
         const ids = result.workItems
-            .slice(0, PLANNING_WORK_ITEM_QUERY_LIMIT)
+            .slice(0, this._config.planningQueryLimit)
             .flatMap((wi: WorkItemReference) => wi.id !== undefined ? [wi.id] : []);
 
         if (ids.length === 0) {
@@ -448,12 +489,12 @@ export class AdoClient {
         }
 
         const workItemMap = new Map<number, WorkItem>();
-        await this.fetchWorkItemsIntoMap(witApi, project, ids, workItemMap, PLANNING_WORK_ITEM_TOTAL_LIMIT);
+        await this.fetchWorkItemsIntoMap(witApi, project, ids, workItemMap, this._config.planningTotalLimit);
 
         let missingParentIds = this.findMissingParentIds(workItemMap);
         const requestedParentIds = new Set<number>();
-        while (missingParentIds.length > 0 && workItemMap.size < PLANNING_WORK_ITEM_TOTAL_LIMIT) {
-            const remainingCapacity = PLANNING_WORK_ITEM_TOTAL_LIMIT - workItemMap.size;
+        while (missingParentIds.length > 0 && workItemMap.size < this._config.planningTotalLimit) {
+            const remainingCapacity = this._config.planningTotalLimit - workItemMap.size;
             const parentBatchIds = missingParentIds
                 .filter(id => !requestedParentIds.has(id))
                 .slice(0, remainingCapacity);
@@ -467,7 +508,7 @@ export class AdoClient {
                 project,
                 parentBatchIds,
                 workItemMap,
-                PLANNING_WORK_ITEM_TOTAL_LIMIT
+                this._config.planningTotalLimit
             );
             missingParentIds = this.findMissingParentIds(workItemMap);
         }
@@ -579,16 +620,9 @@ export class AdoClient {
         project: string,
         organization?: string
     ): Promise<WorkItemType[]> {
-        const cacheKey = JSON.stringify([organization ?? this._organization ?? null, project]);
-        const cached = this._workItemTypesCache.get(cacheKey);
-        if (cached) {
-            return cached;
-        }
         const witApi: IWorkItemTrackingApi = await this.getConnectionFor(organization).getWorkItemTrackingApi();
         const types = await witApi.getWorkItemTypes(project);
-        const filtered = (types ?? []).filter((type): type is WorkItemType => type !== null && !type.isDisabled);
-        this._workItemTypesCache.set(cacheKey, filtered);
-        return filtered;
+        return (types ?? []).filter((type): type is WorkItemType => type !== null && !type.isDisabled);
     }
 
     async getWorkItemTypeStates(
@@ -596,19 +630,11 @@ export class AdoClient {
         workItemType: string,
         organization?: string
     ): Promise<string[]> {
-        const cacheKey = JSON.stringify([organization ?? this._organization ?? null, project, workItemType]);
-        const cached = this._workItemStatesByType.get(cacheKey);
-        if (cached) {
-            return cached;
-        }
-
         const witApi: IWorkItemTrackingApi = await this.getConnectionFor(organization).getWorkItemTrackingApi();
         const states = await witApi.getWorkItemTypeStates(project, workItemType);
-        const names = (states ?? [])
+        return (states ?? [])
             .map(state => state.name)
             .filter((name): name is string => typeof name === 'string' && name.trim().length > 0);
-        this._workItemStatesByType.set(cacheKey, names);
-        return names;
     }
 
     async getWorkItemTypeIconUrls(
@@ -616,28 +642,63 @@ export class AdoClient {
         organization?: string
     ): Promise<Map<string, string>> {
         const cacheKey = workItemTypeScopeKey(organization ?? this._organization, project);
-        const now = Date.now();
-        const cached = this._workItemTypeIconsByScope.get(cacheKey);
-        if (cached && cached.expiresAt > now) {
-            return cached.icons;
+        if (this._iconCache) {
+            const cached = this._iconCache.get(cacheKey);
+            if (cached) { return cached; }
         }
-
         const types = await this.getWorkItemTypes(project, organization);
         const icons = new Map<string, string>();
         for (const type of types) {
             const name = type.name?.trim();
             const iconUrl = type.icon?.url?.trim();
-            if (!name || !iconUrl) {
-                continue;
-            }
+            if (!name || !iconUrl) { continue; }
             icons.set(normalizeWorkItemTypeName(name), iconUrl);
         }
-
-        this._workItemTypeIconsByScope.set(cacheKey, {
-            expiresAt: now + WORK_ITEM_TYPE_ICON_CACHE_TTL_MS,
-            icons
-        });
+        if (this._iconCache) {
+            this._iconCache.set(cacheKey, icons);
+        }
         return icons;
+    }
+
+    async getWorkItemTypeSchemas(project: string, organization?: string): Promise<WorkItemTypeSchema[]> {
+        const scopeKey = workItemTypeScopeKey(organization ?? this._organization, project);
+        if (this._typeSchemaCache) {
+            const cached = this._typeSchemaCache.get(scopeKey);
+            if (cached) { return cached; }
+        }
+
+        const witApi: IWorkItemTrackingApi = await this.getConnectionFor(organization).getWorkItemTrackingApi();
+        const types = await witApi.getWorkItemTypes(project);
+        const filtered = (types ?? []).filter(t => t !== null && !t.isDisabled);
+
+        const schemas: WorkItemTypeSchema[] = await Promise.all(
+            filtered.map(async (type): Promise<WorkItemTypeSchema> => {
+                const typeName = type.name ?? '';
+                const states = await witApi.getWorkItemTypeStates(project, typeName);
+                return {
+                    name: typeName,
+                    referenceName: type.referenceName ?? '',
+                    color: type.color ?? '',
+                    iconUrl: type.icon?.url ?? '',
+                    fields: [], // ponytail: Phase 2 will populate via getWorkItemTypeFieldsWithReferences
+                    states: (states ?? []).map(s => ({
+                        name: s.name ?? '',
+                        category: s.category ?? '',
+                        color: s.color ?? '',
+                    })),
+                };
+            })
+        );
+
+        if (this._typeSchemaCache) {
+            this._typeSchemaCache.set(scopeKey, schemas);
+        }
+        return schemas;
+    }
+
+    async clearTypeSchemaCache(): Promise<void> {
+        await this._typeSchemaCache?.clear();
+        await this._iconCache?.clear();
     }
 
     // -------------------------------------------------------------------------
@@ -671,8 +732,7 @@ export class AdoClient {
         };
 
         // Limit PR results to prevent UI freeze with large lists
-        const PR_LIMIT = 100;
-        (searchCriteria as GitPullRequestSearchCriteria & { top?: number }).top = PR_LIMIT;
+        (searchCriteria as GitPullRequestSearchCriteria & { top?: number }).top = this._config.pullRequestLimit;
 
         if (filter === 'created' && currentUserDescriptor) {
             searchCriteria.creatorId = currentUserDescriptor;
@@ -1001,7 +1061,7 @@ export class AdoClient {
      */
     async getSavedQueries(project: string, organization?: string): Promise<SavedQuery[]> {
         const witApi: IWorkItemTrackingApi = await this.getConnectionFor(organization).getWorkItemTrackingApi();
-        const roots = await witApi.getQueries(project, QueryExpand.None, 2, false);
+        const roots = await witApi.getQueries(project, QueryExpand.None, this._config.savedQueryFolderDepth, false);
         const queries: SavedQuery[] = [];
         const flatten = (items: QueryHierarchyItem[] | undefined): void => {
             for (const item of items ?? []) {
@@ -1021,13 +1081,13 @@ export class AdoClient {
      */
     async getWorkItemsBySavedQuery(project: string, queryId: string, organization?: string): Promise<WorkItem[]> {
         const witApi: IWorkItemTrackingApi = await this.getConnectionFor(organization).getWorkItemTrackingApi();
-        const result = await witApi.queryById(queryId, { project }, false, WORK_ITEM_QUERY_LIMIT);
+        const result = await witApi.queryById(queryId, { project }, false, this._config.workItemQueryLimit);
         if (!result.workItems || result.workItems.length === 0) {
             return [];
         }
 
         const ids = result.workItems
-            .slice(0, WORK_ITEM_QUERY_LIMIT)
+            .slice(0, this._config.workItemQueryLimit)
             .flatMap((wi: WorkItemReference) => wi.id !== undefined ? [wi.id] : []);
 
         if (ids.length === 0) {
@@ -1065,7 +1125,7 @@ export class AdoClient {
         organization?: string
     ): Promise<ClassificationPath[]> {
         const witApi: IWorkItemTrackingApi = await this.getConnectionFor(organization).getWorkItemTrackingApi();
-        const root = await witApi.getClassificationNode(project, structureGroup, undefined, 10);
+        const root = await witApi.getClassificationNode(project, structureGroup, undefined, this._config.classificationNodeDepth);
         const paths: ClassificationPath[] = [];
         const flatten = (node: WorkItemClassificationNode, parentPath: string): void => {
             const nodeName = node.name?.trim() ?? '';
@@ -1176,7 +1236,7 @@ export class AdoClient {
             undefined, // resultFilter
             undefined, // tagFilters
             undefined, // properties
-            BUILDS_PER_QUERY, // top
+            this._config.buildsPerQuery, // top
             undefined, // continuationToken
             undefined, // maxBuildsPerDefinition
             undefined, // deletedFilter
@@ -1213,7 +1273,7 @@ export class AdoClient {
 
         const buildApi: IBuildApi = await this.getConnectionFor(organization).getBuildApi();
         const builds = await Promise.all(
-            buildIds.slice(0, BUILDS_PER_QUERY).map(id =>
+            buildIds.slice(0, this._config.buildsPerQuery).map(id =>
                 buildApi.getBuild(project, id).catch(() => undefined)
             )
         );
@@ -1551,7 +1611,7 @@ export class AdoClient {
         const pendingIds = ids.filter(id => !workItemMap.has(id));
         while (pendingIds.length > 0 && workItemMap.size < totalLimit) {
             const remainingCapacity = totalLimit - workItemMap.size;
-            const batchIds = pendingIds.splice(0, Math.min(WORK_ITEM_BATCH_SIZE, remainingCapacity));
+            const batchIds = pendingIds.splice(0, Math.min(this._config.workItemBatchSize, remainingCapacity));
             if (batchIds.length === 0) {
                 break;
             }

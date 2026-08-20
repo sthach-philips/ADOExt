@@ -22,12 +22,12 @@
   },
   "permissions": {
     "allow": [
-      "Bash(npm run compile)",
-      "Bash(npm run lint)",
-      "Bash(npm run watch)",
-      "Bash(npm run check:extension)",
-      "Bash(npm run check:webviews)",
-      "Bash(npm install)",
+      "Bash(pnpm run compile)",
+      "Bash(pnpm run lint)",
+      "Bash(pnpm run watch)",
+      "Bash(pnpm run check:extension)",
+      "Bash(pnpm run check:webviews)",
+      "Bash(pnpm install)",
       "Bash(npx @vscode/vsce package*)"
     ]
   }

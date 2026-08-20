@@ -4,7 +4,7 @@ const esbuild = require('esbuild');
 
 const watch = process.argv.includes('--watch');
 const root = path.resolve(__dirname, '..');
-const outdir = path.join(root, 'out');
+const outdir = path.join(root, 'bin');
 
 const buildOptions = {
     entryPoints: [path.join(root, 'src', 'extension.ts')],

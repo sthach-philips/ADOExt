@@ -12,6 +12,8 @@ import { bundledWorkItemTypeIconFile } from '../utils/workItemTypeIcons';
 import { WorkItemIconResolver } from './workItemIconResolver';
 import type { AuthRecoveryHandler } from '../utils/authRecovery';
 import { handleProviderError } from './providerErrors';
+import { resolveSections, type PlanningViewSection } from '../config/planningConfig';
+import { filterWorkItemsByTitle } from '../utils/planningFilter';
 
 interface ScopedWorkItem {
     workItem: WorkItem;
@@ -40,6 +42,19 @@ export class WorkItemStateGroup extends vscode.TreeItem {
         this.description = `${count} item${count !== 1 ? 's' : ''}`;
         this.iconPath = stateIcon(state);
         this.contextValue = 'workItemStateGroup';
+    }
+}
+
+export class WorkItemSectionGroup extends vscode.TreeItem {
+    constructor(
+        public readonly section: PlanningViewSection,
+        public readonly count: number,
+        public readonly items: ScopedWorkItem[]
+    ) {
+        super(section.label, section.collapsed ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.Expanded);
+        this.description = `${count} item${count !== 1 ? 's' : ''}`;
+        this.iconPath = new vscode.ThemeIcon('list-tree');
+        this.contextValue = 'workItemSectionGroup';
     }
 }
 
@@ -115,6 +130,7 @@ function bundledTypeIcon(wiType: string): vscode.ThemeIcon | vscode.Uri {
 type WorkItemTreeNode =
     | WorkItemScopeGroup
     | WorkItemStateGroup
+    | WorkItemSectionGroup
     | WorkItemNode
     | vscode.TreeItem;
 
@@ -149,10 +165,10 @@ export class WorkItemProvider implements vscode.TreeDataProvider<WorkItemTreeNod
 
     async getChildren(element?: WorkItemTreeNode): Promise<WorkItemTreeNode[]> {
         if (element instanceof WorkItemScopeGroup) {
-            return this.buildStateGroups(element.items);
+            return this.buildSectionGroups(element.items);
         }
 
-        if (element instanceof WorkItemStateGroup) {
+        if (element instanceof WorkItemStateGroup || element instanceof WorkItemSectionGroup) {
             return element.items.map(item => {
                 const workItemType = (item.workItem.fields?.['System.WorkItemType'] as string | undefined) ?? '';
                 return new WorkItemNode(
@@ -196,7 +212,7 @@ export class WorkItemProvider implements vscode.TreeDataProvider<WorkItemTreeNod
             }
 
             if (scopes.length === 1) {
-                return this.buildStateGroups(scopedItems);
+                return this.buildSectionGroups(scopedItems);
             }
 
             const byScope = new Map<string, ScopedWorkItem[]>();
@@ -249,6 +265,45 @@ export class WorkItemProvider implements vscode.TreeDataProvider<WorkItemTreeNod
                 return new WorkItemStateGroup(state, sortedItems.length, sortedItems);
             })
             .sort((left, right) => stateSortValue(left.state) - stateSortValue(right.state));
+    }
+
+    private buildSectionGroups(items: ScopedWorkItem[]): (WorkItemSectionGroup | WorkItemStateGroup)[] {
+        const sections = resolveSections(this.config.planningViews, 'workItems');
+        if (sections.length === 0) {
+            return this.buildStateGroups(items);
+        }
+
+        const titleFilter = this.config.resolvedFilter('workItems').titleFilter;
+        const threshold = this.config.fuzzySearchThreshold;
+        const filtered = titleFilter ? filterWorkItemsByTitle(items, titleFilter, threshold) : items;
+
+        const groups: WorkItemSectionGroup[] = [];
+        const claimed = new Set<ScopedWorkItem>();
+
+        for (const section of sections) {
+            const stateSet = new Set(section.stateFilter.map(s => s.toLowerCase()));
+            const sectionItems = filtered.filter(item => {
+                const state = (item.workItem.fields?.['System.State'] as string | undefined) ?? '';
+                return stateSet.has(state.toLowerCase());
+            });
+            sectionItems.forEach(item => claimed.add(item));
+            if (sectionItems.length > 0) {
+                const sorted = this.sortedItems(sectionItems);
+                groups.push(new WorkItemSectionGroup(section, sorted.length, sorted));
+            }
+        }
+
+        const showUnmatched = this.config.resolvedFilter('workItems').showUnmatchedStates;
+        if (showUnmatched) {
+            const unmatched = filtered.filter(item => !claimed.has(item));
+            if (unmatched.length > 0) {
+                const otherSection: PlanningViewSection = { id: '_other', label: 'Other', stateFilter: [], order: 9999 };
+                const sorted = this.sortedItems(unmatched);
+                groups.push(new WorkItemSectionGroup(otherSection, sorted.length, sorted));
+            }
+        }
+
+        return groups;
     }
 
     private getSetupNode(): vscode.TreeItem | undefined {

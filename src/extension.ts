@@ -65,6 +65,16 @@ import {
     rerunPipelineRun,
     viewPipelineRunDetails
 } from './commands/pipelineCommands';
+import {
+    setPlanningAreaFilter,
+    setPlanningIterationFilter,
+    setPlanningTypeFilter,
+    setPlanningStateFilter,
+    setPlanningTitleFilter,
+    setPlanningGlobalFilter
+} from './commands/planningCommands';
+import { DEFAULT_PLANNING_CONFIG } from './config/planningConfig';
+import type { PlanningConfig, PlanningViewKey } from './config/planningConfig';
 import { McpServerManager } from './mcp/mcpServerManager';
 import { TodoCodeActionProvider } from './views/todoCodeActionProvider';
 import { AdoCompletionProvider } from './providers/completionProvider';
@@ -80,11 +90,43 @@ import {
 } from './views/lazyPanels';
 import { CommandRegistry } from './commands/commandRegistry';
 
+const TOOLBAR_SNAPSHOT_KEY = 'adoext.toolbar.actionsSnapshot';
+const PLANNING_VIEW_KEYS: PlanningViewKey[] = ['workItems', 'backlog', 'sprints', 'boards'];
+
+function updateToolbarContextKeys(planningConfig: PlanningConfig): void {
+    for (const viewKey of PLANNING_VIEW_KEYS) {
+        const allPossible = DEFAULT_PLANNING_CONFIG[viewKey].actions;
+        const activeSet = new Set(planningConfig[viewKey].actions);
+        for (const cmd of allPossible) {
+            const suffix = cmd.startsWith('adoext.') ? cmd.slice('adoext.'.length) : cmd;
+            void vscode.commands.executeCommand('setContext', `adoext.${viewKey}.show.${suffix}`, activeSet.has(cmd));
+        }
+    }
+}
+
+function hasActionsOrderChanged(
+    snapshot: Partial<Record<PlanningViewKey, string[]>>,
+    incoming: PlanningConfig
+): boolean {
+    return PLANNING_VIEW_KEYS.some(viewKey => {
+        const old = snapshot[viewKey] ?? DEFAULT_PLANNING_CONFIG[viewKey].actions;
+        const next = incoming[viewKey].actions;
+        const oldSorted = [...old].sort().join(',');
+        const nextSorted = [...next].sort().join(',');
+        if (oldSorted !== nextSorted) {
+            // content changed (add/remove), not a pure order change
+            return false;
+        }
+        return old.join(',') !== next.join(',');
+    });
+}
+
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     installNotificationMirroring();
     const auth = new AuthProvider();
     const config = new ConfigManager();
-    const client = new AdoClient('');  // token will be set after sign-in
+    const client = new AdoClient('', config, context.globalStorageUri.fsPath);
+    await client.initCaches();
     const attemptedForbiddenRecoveries = new Set<string>();
     let authRecoveryPromise: Promise<AuthRecoveryResult> | undefined;
     let reauthenticationPromptActive = false;
@@ -400,6 +442,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     registry.addRefresh('adoext.refreshBoards', () => boardProvider.refresh());
 
+    registry.add('adoext.refreshWorkItemTypeSchema', async () => {
+        await client.clearTypeSchemaCache();
+        refreshAllViews();
+    });
+
     registry.add('adoext.setPlanningAssignedFilter', async () => {
         const current = config.planningAssignedFilter;
         const choice = await vscode.window.showQuickPick(
@@ -417,6 +464,50 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         backlogProvider.refresh();
         sprintProvider.refresh();
         boardProvider.refresh();
+    });
+
+    registry.addGuarded('adoext.setPlanningAreaFilter', async () => {
+        await setPlanningAreaFilter(client, config);
+        backlogProvider.refresh();
+        sprintProvider.refresh();
+        boardProvider.refresh();
+        workItemProvider.refresh();
+    });
+
+    registry.addGuarded('adoext.setPlanningIterationFilter', async () => {
+        await setPlanningIterationFilter(client, config);
+        backlogProvider.refresh();
+        sprintProvider.refresh();
+        boardProvider.refresh();
+    });
+
+    registry.addGuarded('adoext.setPlanningTypeFilter', async () => {
+        await setPlanningTypeFilter(client, config);
+        backlogProvider.refresh();
+        sprintProvider.refresh();
+        boardProvider.refresh();
+        workItemProvider.refresh();
+    });
+
+    registry.addGuarded('adoext.setPlanningStateFilter', async () => {
+        await setPlanningStateFilter(client, config);
+        backlogProvider.refresh();
+        sprintProvider.refresh();
+        boardProvider.refresh();
+        workItemProvider.refresh();
+    });
+
+    registry.add('adoext.setPlanningTitleFilter', async () => {
+        await setPlanningTitleFilter(config);
+        backlogProvider.refresh();
+        sprintProvider.refresh();
+        boardProvider.refresh();
+        workItemProvider.refresh();
+    });
+
+    registry.addGuarded('adoext.setPlanningGlobalFilter', async () => {
+        await setPlanningGlobalFilter(client, config);
+        refreshAllViews();
     });
 
     registry.addGuarded('adoext.openBacklogView', async () => {
@@ -847,6 +938,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }
 
     updateSignedInContext();
+    updateToolbarContextKeys(config.planningViews);
+    if (!context.globalState.get(TOOLBAR_SNAPSHOT_KEY)) {
+        const initial: Partial<Record<PlanningViewKey, string[]>> = {};
+        for (const viewKey of PLANNING_VIEW_KEYS) {
+            initial[viewKey] = config.planningViews[viewKey].actions;
+        }
+        void context.globalState.update(TOOLBAR_SNAPSHOT_KEY, initial);
+    }
     notificationService.applyConfig();
 
     // React to Microsoft auth session changes so token refreshes are picked up
@@ -906,6 +1005,27 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
                 }
                 if (e.affectsConfiguration('adoext.workItemHideStates')) {
                     updateWorkItemDoneHiddenContext();
+                }
+                if (e.affectsConfiguration('adoext.planningViews')) {
+                    const newPlanningConfig = config.planningViews;
+                    updateToolbarContextKeys(newPlanningConfig);
+                    type Snapshot = Partial<Record<PlanningViewKey, string[]>>;
+                    const snapshot = context.globalState.get<Snapshot>(TOOLBAR_SNAPSHOT_KEY, {});
+                    if (hasActionsOrderChanged(snapshot, newPlanningConfig)) {
+                        void showInformationMessage(
+                            'Toolbar button order changed. Reload to apply.',
+                            'Reload Now'
+                        ).then(choice => {
+                            if (choice === 'Reload Now') {
+                                void vscode.commands.executeCommand('workbench.action.reloadWindow');
+                            }
+                        });
+                    }
+                    const newSnapshot: Snapshot = {};
+                    for (const viewKey of PLANNING_VIEW_KEYS) {
+                        newSnapshot[viewKey] = newPlanningConfig[viewKey].actions;
+                    }
+                    void context.globalState.update(TOOLBAR_SNAPSHOT_KEY, newSnapshot);
                 }
                 refreshAllViews();
                 if (e.affectsConfiguration('adoext.planningAssignedFilter')) {
