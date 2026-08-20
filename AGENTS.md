@@ -16,12 +16,12 @@ Help coding agents make safe, minimal changes in this TypeScript VS Code extensi
 
 ## Build And Validate
 
-- Install: `npm install`
-- Compile: `npm run compile`
-- Watch: `npm run watch`
-- Lint: `npm run lint`
+- Install: `pnpm install`
+- Compile: `pnpm run compile`
+- Watch: `pnpm run watch`
+- Lint: `pnpm run lint`
 
-Always run `npm run compile` after TypeScript changes. Run `npm run lint` when touching multiple files or refactoring.
+Always run `pnpm run compile` after TypeScript changes. Run `pnpm run lint` when touching multiple files or refactoring.
 
 ## Architecture Map
 
@@ -116,7 +116,7 @@ Never import host-side modules from webview files or vice versa — the build wi
 3. Use `adoErrors.ts` classification to distinguish auth vs. network vs. not-found errors.
 
 **Webview shows blank/broken**:
-1. Run `npm run compile:webviews` — webview JS is compiled separately.
+1. Run `pnpm run compile:webviews` -- webview JS is compiled separately.
 2. Open VS Code Developer Tools (Help → Toggle Developer Tools) and check the webview iframe console.
 3. Check that the panel's `getWebviewContent()` passes the correct `media/webviews/*.js` URIs with `webview.asWebviewUri()`.
 

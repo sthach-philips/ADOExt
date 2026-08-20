@@ -10,12 +10,12 @@
   },
   "permission": {
     "bash": {
-      "npm run compile": "allow",
-      "npm run lint": "allow",
-      "npm run watch": "allow",
-      "npm run check:extension": "allow",
-      "npm run check:webviews": "allow",
-      "npm install": "allow",
+      "pnpm run compile": "allow",
+      "pnpm run lint": "allow",
+      "pnpm run watch": "allow",
+      "pnpm run check:extension": "allow",
+      "pnpm run check:webviews": "allow",
+      "pnpm install": "allow",
       "npx @vscode/vsce package*": "allow",
       "*": "ask"
     }

@@ -2,9 +2,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "npm: install",
+      "label": "pnpm: install",
       "type": "shell",
-      "command": "npm",
+      "command": "pnpm",
       "args": [
         "install"
       ],
@@ -14,11 +14,11 @@
       }
     },
     {
-      "label": "npm: install and compile",
+      "label": "pnpm: install and compile",
       "dependsOrder": "sequence",
       "dependsOn": [
-        "npm: install",
-        "npm: compile"
+        "pnpm: install",
+        "pnpm: compile"
       ],
       "presentation": {
         "reveal": "never",
@@ -26,8 +26,10 @@
       }
     },
     {
-      "type": "npm",
-      "script": "compile",
+      "label": "pnpm: compile",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "compile"],
       "group": {
         "kind": "build",
         "isDefault": true
@@ -41,8 +43,10 @@
       }
     },
     {
-      "type": "npm",
-      "script": "watch",
+      "label": "pnpm: watch",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "watch"],
       "isBackground": true,
       "problemMatcher": [
         "$tsc-watch"
@@ -54,16 +58,23 @@
     },
     {
       "label": "mock-server: start",
-      "type": "npm",
-      "script": "start",
-      "path": "mock-server",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "start"],
+      "options": {
+        "cwd": "${workspaceFolder}/mock-server"
+      },
       "isBackground": true,
       "problemMatcher": {
-        "pattern": [{ "regexp": "." }],
+        "pattern": {
+          "regexp": "^never$",
+          "file": 1,
+          "message": 1
+        },
         "background": {
-          "activeOnStart": false,
-          "beginsPattern": "^Mock ADO server running",
-          "endsPattern": ""
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "^Mock ADO server running"
         }
       },
       "presentation": {
@@ -74,7 +85,7 @@
     {
       "label": "preLaunch: mock (compile + server)",
       "dependsOrder": "parallel",
-      "dependsOn": ["npm: compile", "mock-server: start"],
+      "dependsOn": ["pnpm: compile", "mock-server: start"],
       "presentation": {
         "reveal": "never",
         "panel": "dedicated"

@@ -26,7 +26,7 @@
       "outFiles": [
         "${workspaceFolder}/bin/**/*.js"
       ],
-      "preLaunchTask": "npm: install and compile"
+      "preLaunchTask": "pnpm: install and compile"
     },
     {
       "name": "Run ADOExt",
@@ -38,7 +38,7 @@
       "outFiles": [
         "${workspaceFolder}/bin/**/*.js"
       ],
-      "preLaunchTask": "npm: compile"
+      "preLaunchTask": "pnpm: compile"
     },
     {
       "name": "Run ADOExt (Watch)",
@@ -50,7 +50,7 @@
       "outFiles": [
         "${workspaceFolder}/bin/**/*.js"
       ],
-      "preLaunchTask": "npm: watch"
+      "preLaunchTask": "pnpm: watch"
     }
   ]
 }

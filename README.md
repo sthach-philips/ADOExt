@@ -142,8 +142,8 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 ```bash
 git clone https://github.com/CompN3rd/ADOExt
 cd ADOExt
-npm install
-npm run compile
+pnpm install
+pnpm run compile
 code --install-extension ./adoext-<version>.vsix
 ```
 
