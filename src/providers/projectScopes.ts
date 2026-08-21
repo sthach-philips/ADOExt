@@ -1,5 +1,6 @@
 import type { AdoClient } from '../api/adoClient';
-import { ALL_PROJECTS, type ConfigManager } from '../config/configManager';
+import { ALL_PROJECTS } from '../config/constants';
+import type { ConfigManager } from '../config/configManager';
 import { mapWithConcurrencyLimit } from '../utils/async';
 
 export interface ProjectScope {

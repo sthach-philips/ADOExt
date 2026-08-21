@@ -118,7 +118,7 @@ export function stateIcon(state: string): vscode.ThemeIcon {
 function bundledTypeIcon(wiType: string): vscode.ThemeIcon | vscode.Uri {
     const fileName = bundledWorkItemTypeIconFile(wiType);
     if (fileName) {
-        const extension = vscode.extensions.getExtension('MarcKassubeck.adoext');
+        const extension = vscode.extensions.getExtension('sthach-philips.adoext');
         if (extension) {
             return vscode.Uri.joinPath(extension.extensionUri, 'media', 'icons', 'workitems', fileName);
         }

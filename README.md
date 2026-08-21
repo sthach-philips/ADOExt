@@ -140,7 +140,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
 **From Source:**
 ```bash
-git clone https://github.com/CompN3rd/ADOExt
+git clone https://github.com/sthach-philips/ADOExt
 cd ADOExt
 pnpm install
 pnpm run compile
@@ -344,7 +344,7 @@ All commands are available via the Command Palette (Ctrl+Shift+P / Cmd+Shift+P) 
 
 ## 🤝 Contributing
 
-We welcome contributions! Please feel free to open issues or pull requests on [GitHub](https://github.com/CompN3rd/ADOExt).
+We welcome contributions! Please feel free to open issues or pull requests on [GitHub](https://github.com/sthach-philips/ADOExt).
 
 ### Development Setup
 ```bash
@@ -396,6 +396,6 @@ This extension is open source and available under the [MIT License](LICENSE).
 
 ## 🐛 Feedback & Support
 
-Found a bug or have a feature request? [Open an issue](https://github.com/CompN3rd/ADOExt/issues) on GitHub.
+Found a bug or have a feature request? [Open an issue](https://github.com/sthach-philips/ADOExt/issues) on GitHub.
 
 Happy coding! 🎉

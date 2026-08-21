@@ -3,7 +3,8 @@ import type { PipelineRunsFilter } from '../api/adoClient';
 import { parsePlanningConfig, resolveFilter, DEFAULT_PLANNING_CONFIG } from './planningConfig';
 import type { PlanningConfig, PlanningFilterFields, PlanningViewKey, PlanningViewSection } from './planningConfig';
 
-export const ALL_PROJECTS = '*';
+import { ALL_PROJECTS } from './constants';
+export { ALL_PROJECTS };
 
 export type ProjectSelectionsByOrganization = Record<string, string[]>;
 export type WorkItemQueryFilter = 'assigned' | 'created' | 'mentioned' | 'all';
