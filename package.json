@@ -3,7 +3,7 @@
   "displayName": "ADOExt - Azure DevOps Integration",
   "description": "Full-featured Azure DevOps integration for VS Code: work items, pull requests, comments, and multi-account/org support.",
   "version": "1.8.0",
-  "publisher": "MarcKassubeck",
+  "publisher": "sthach-philips",
   "engines": {
     "vscode": "^1.101.0"
   },
@@ -25,11 +25,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CompN3rd/ADOExt.git"
+    "url": "https://github.com/sthach-philips/ADOExt.git"
   },
-  "homepage": "https://github.com/CompN3rd/ADOExt",
+  "homepage": "https://github.com/sthach-philips/ADOExt",
   "bugs": {
-    "url": "https://github.com/CompN3rd/ADOExt/issues"
+    "url": "https://github.com/sthach-philips/ADOExt/issues"
   },
   "contributes": {
     "mcpServerDefinitionProviders": [

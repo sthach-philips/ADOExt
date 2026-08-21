@@ -1,15 +1,15 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
 
-// ponytail: uses MarcKassubeck.adoext -- the actual publisher from package.json
+// ponytail: uses sthach-philips.adoext -- the actual publisher from package.json
 suite('Extension Activation', () => {
     test('extension is present', () => {
-        const ext = vscode.extensions.getExtension('MarcKassubeck.adoext');
+        const ext = vscode.extensions.getExtension('sthach-philips.adoext');
         assert.ok(ext, 'Extension not found');
     });
 
     test('extension activates without error', async () => {
-        const ext = vscode.extensions.getExtension('MarcKassubeck.adoext');
+        const ext = vscode.extensions.getExtension('sthach-philips.adoext');
         assert.ok(ext);
         await ext.activate();
         assert.strictEqual(ext.isActive, true);

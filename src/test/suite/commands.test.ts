@@ -7,7 +7,7 @@ suite('Command Registration', () => {
     let declaredCommands: string[] = [];
 
     suiteSetup(async () => {
-        const ext = vscode.extensions.getExtension('MarcKassubeck.adoext');
+        const ext = vscode.extensions.getExtension('sthach-philips.adoext');
         if (ext && !ext.isActive) {
             await ext.activate();
         }
